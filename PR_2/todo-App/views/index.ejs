@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Todo App</title>
-  <link rel="stylesheet" href=".public/style.css">
+  <link rel="stylesheet" href="/style.css">
 </head>
+
 <body>
 
   <div class="container">
@@ -11,26 +13,30 @@
 
     <form action="/add" method="POST">
       <input type="text" name="task" placeholder="Write your task" required>
+      <textarea name="description" placeholder="Write description"></textarea>
       <button>Add</button>
     </form>
 
     <ul>
       <% todoList.forEach((oneTodo, index) => { %>
-        <li class="<%= oneTodo.completed ? 'done' : '' %>">
+        <li>
 
-          <form action="/toggle" method="POST">
-            <input type="hidden" name="index" value="<%= index %>">
-            <input type="checkbox"
-              onchange="this.form.submit()"
-              <%= oneTodo.completed ? 'checked' : '' %>>
-          </form>
+          <div class="todo-content">
+            <strong><%= oneTodo.text %></strong>
 
-          <span><%= oneTodo.text %></span>
+            <% if (oneTodo.description) { %>
+              <p><%= oneTodo.description %></p>
+            <% } %>
+          </div>
 
-          <form action="/delete" method="POST">
-            <input type="hidden" name="index" value="<%= index %>">
-            <button class="delete">X</button>
-          </form>
+          <div class="actions">
+            <a href="/edit/<%= index %>" class="edit">Edit</a>
+
+            <form action="/delete" method="POST">
+              <input type="hidden" name="index" value="<%= index %>">
+              <button class="delete">X</button>
+            </form>
+          </div>
 
         </li>
       <% }) %>
@@ -39,6 +45,4 @@
 
 </body>
 </html>
-
-
 

@@ -13,26 +13,36 @@ app.get("/", (req, res) => {
 
 app.post("/add", (req, res) => {
   const todoText = req.body.task;
+  const todoDescription = req.body.description;
 
   if (todoText !== "") {
     todoList.push({
       text: todoText,
+      description: todoDescription,
       completed: false
     });
   }
 
   res.redirect("/");
 });
-
-app.post("/toggle", (req, res) => {
-  const todoIndex = req.body.index;
-  todoList[todoIndex].completed = !todoList[todoIndex].completed;
-  res.redirect("/");
-});
-
 app.post("/delete", (req, res) => {
   const todoIndex = req.body.index;
   todoList.splice(todoIndex, 1);
+  res.redirect("/");
+});
+
+app.get("/edit/:index", (req, res) => {
+  const index = req.params.index;
+  res.render("edit", { todo: todoList[index], index });
+});
+
+app.post("/edit/:index", (req, res) => {
+  const index = req.params.index;
+  const { task, description } = req.body;
+
+  todoList[index].text = task;
+  todoList[index].description = description;
+
   res.redirect("/");
 });
 
