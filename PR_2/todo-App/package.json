@@ -1,0 +1,22 @@
+{
+  "name": "todo-app",
+  "version": "1.0.0",
+  "description": "Simple Todo App using Node, Express, and EJS",
+  "main": "Todo.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node Todo.js",
+    "dev": "nodemon Todo.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.19.2",
+    "ejs": "^3.1.9"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.11"
+  }
+}
+
