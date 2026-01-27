@@ -1,0 +1,19 @@
+{
+  "name": "pr_3-matrix",
+  "version": "1.0.0",
+  "description": "",
+  "main": "MatrixServer.js",
+  "scripts": {
+    "start": "node MatrixServer.js",
+    "dev": "nodemon MatrixServer.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "ejs": "^4.0.1",
+    "express": "^5.2.1",
+    "nodemon": "^3.1.11"
+  }
+}
