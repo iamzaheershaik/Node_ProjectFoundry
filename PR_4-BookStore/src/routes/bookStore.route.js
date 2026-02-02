@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const upload = require("../config/bookStore.multer");
 const book = require("../controllers/book.controller");
+const upload = require("../middleware/bookStore.multer");
 
 router.get("/", book.getBooks);
 router.post("/add-book", upload.single("cover"), book.addBook);

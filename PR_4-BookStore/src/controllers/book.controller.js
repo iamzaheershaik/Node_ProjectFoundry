@@ -13,13 +13,18 @@ exports.getBooks = async (req, res) => {
 };
 
 exports.addBook = async (req, res) => {
-  await Book.create({
-    ...req.body,
-    cover: req.file.filename
-  });
-  res.redirect("/");
+  try {
+    const bookPath = req.file ? `uploads/${req.file.filename}` : "";
+    await Book.create({
+      ...req.body,
+      cover: bookPath
+    });
+    return res.redirect("/");
+  } catch (error) {
+    console.log(error);
+    return res.redirect("/");
+  }
 };
-
 exports.deleteBook = async (req, res) => {
   await Book.findByIdAndDelete(req.params.id);
   res.redirect("/");
