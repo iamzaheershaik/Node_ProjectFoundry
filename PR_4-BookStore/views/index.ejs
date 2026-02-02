@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/styles/style.css">
+  <title>BookStore</title>
+</head>
+<body>
+  <h1>📚 Book Store</h1>
+ <form class="form" action="/add-book" method="POST" enctype="multipart/form-data">
+  <input name="title" placeholder="Title" required>
+  <input name="author" placeholder="Author" required>
+  <input name="price" placeholder="Price" required>
+  <input name="genre" placeholder="Genre" required>
+  <input type="file" name="cover" required>
+  <button>Add Book</button>
+</form>
+
+<div class="grid">
+<% books.forEach(book => { %>
+  <div class="card">
+    <img src="/uploads/<%= book.cover %>">
+    <div class="card-body">
+      <h3><%= book.title %></h3>
+      <p><%= book.author %></p>
+      <p class="price">₹ <%= book.price %></p>
+
+      <div class="actions">
+        <a href="/edit-book/<%= book._id %>">✏️</a>
+        <form action="/delete-book/<%= book._id %>" method="POST">
+          <button>🗑</button>
+        </form>
+      </div>
+    </div>
+  </div>
+<% }) %>
+</div>
+</body>
+</html>

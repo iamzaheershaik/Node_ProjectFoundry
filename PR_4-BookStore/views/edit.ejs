@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Edit Book</title>
+  <link rel="stylesheet" href="/styles/style.css">
+</head>
+
+<body>
+
+<h1>✏️ Edit Book</h1>
+
+<form class="form" action="/update-book/<%= book._id %>" method="POST" enctype="multipart/form-data">
+
+  <input name="title" value="<%= book.title %>" placeholder="Book Title" required>
+  <input name="author" value="<%= book.author %>" placeholder="Author" required>
+
+  <input name="price" value="<%= book.price %>" placeholder="Price" required>
+  <input name="genre" value="<%= book.genre %>" placeholder="Genre" required>
+
+  <div style="grid-column: span 2; text-align:center;">
+    <p>Current Cover</p>
+    <img src="/uploads/<%= book.cover %>" style="width:140px;border-radius:8px;">
+  </div>
+
+  <input style="grid-column: span 2;" type="file" name="cover">
+
+  <button>Update Book</button>
+
+</form>
+
+</body>
+</html>
