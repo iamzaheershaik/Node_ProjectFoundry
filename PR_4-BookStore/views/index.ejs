@@ -16,11 +16,10 @@
   <input type="file" name="cover" required>
   <button>Add Book</button>
 </form>
-
 <div class="grid">
 <% books.forEach(book => { %>
   <div class="card">
-    <img src="/uploads/<%= book.cover %>">
+    <img src="<%= book.cover %>"">
     <div class="card-body">
       <h3><%= book.title %></h3>
       <p><%= book.author %></p>
