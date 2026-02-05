@@ -3,8 +3,15 @@ const fs = require("fs");
 const path = require("path");
 
 exports.getBooks = async (req, res) => {
-  const books = await Book.find();
-  res.render("index", { books });
+  const search = req.query.search || "";
+  const books = await Book.find({
+    $or: [
+      { title: { $regex: search, $options: "i" } },
+      { author: { $regex: search, $options: "i" } },
+      { genre: { $regex: search, $options: "i" } }
+    ]
+  });
+  res.render("index", { books, search });
 };
 
 exports.addBook = async (req, res) => {

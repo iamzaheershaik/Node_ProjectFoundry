@@ -130,4 +130,50 @@ h1 {
 .actions button:hover {
   color: #ef4444;
 }
+/* SEARCH FORM — same visual system as .form */
+.search-form {
+  max-width: 900px;
+  margin: 0 auto 30px;
+  background: #020617;
+  padding: 16px;
+  border-radius: 14px;
 
+  display: flex;
+  gap: 12px;
+}
+
+.search-form input {
+  flex: 1;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #1e293b;
+  background: #020617;
+  color: white;
+  font-size: 15px;
+}
+
+.search-form input::placeholder {
+  color: #64748b;
+}
+
+.search-form button {
+  padding: 12px 20px;
+  border-radius: 8px;
+  border: none;
+  background: linear-gradient(135deg,#6366f1,#38bdf8);
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.search-form button:hover {
+  opacity: 0.9;
+}
+
+/* Mobile behavior */
+@media (max-width: 600px) {
+  .search-form {
+    flex-direction: column;
+  }
+}

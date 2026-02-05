@@ -16,6 +16,15 @@
   <input type="file" name="cover" required>
   <button>Add Book</button>
 </form>
+<form class="search-form" action="/" method="GET">
+  <input
+    type="text"
+    name="search"
+    placeholder="Search by title, author, genre"
+    value="<%= search || '' %>"
+  >
+  <button type="submit">🔍 Search</button>
+</form>
 <div class="grid">
 <% books.forEach(book => { %>
   <div class="card">
@@ -23,8 +32,8 @@
     <div class="card-body">
       <h3><%= book.title %></h3>
       <p><%= book.author %></p>
-      <p class="price">₹ <%= book.price %></p>
-
+      <p class="price">₹<%= book.price %></p>
+      <p class="genre"> <%= book.genre %></p>
       <div class="actions">
         <a href="/edit-book/<%= book._id %>">✏️</a>
         <form action="/delete-book/<%= book._id %>" method="POST">
