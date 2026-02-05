@@ -7,7 +7,7 @@
 
 <body>
 
-<h1>✏️ Edit Book</h1>
+<h1>✏️ Edit Manga</h1>
 
 <form class="form" action="/update-book/<%= book._id %>" method="POST" enctype="multipart/form-data">
 
@@ -19,7 +19,7 @@
 
   <div style="grid-column: span 2; text-align:center;">
     <p>Current Cover</p>
-    <img src="<%= book.cover %>" style="width:140px;border-radius:8px;">
+    <img src="<%=book.cover %>" style="width:140px;border-radius:8px;">
   </div>
 
   <input style="grid-column: span 2;" type="file" name="cover">
