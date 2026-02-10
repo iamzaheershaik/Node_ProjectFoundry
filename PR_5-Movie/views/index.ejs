@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('includes/head', {title: 'Home - Movie Library'}) %>
+<body>
+    <%- include('includes/navbar') %>
+
+    <section class="container">
+        <form class="form" action="/add" method="POST" enctype="multipart/form-data">
+            <input name="title" placeholder="Movie Title" required>
+            <input name="director" placeholder="Director" required>
+            <input name="releaseYear" type="number" placeholder="Year" required>
+            <input name="genre" placeholder="Genre" required>
+            
+            <input name="rating" type="number" step="0.1" min="1" max="10" placeholder="Rating (1-10)" required>
+            
+            <input type="file" name="poster" required>
+            <button type="submit">Add Movie</button>
+        </form>
+
+        <form class="search-form" action="/" method="GET">
+            <input type="text" name="search" placeholder="Search ..." value="<%= search || '' %>">
+            <button type="submit">🔍</button>
+        </form>
+
+        <div class="grid">
+            <% movies.forEach(movie => { %>
+                <%- include('includes/movieCard', {movie: movie}) %>
+            <% }) %>
+        </div>
+    </section>
+
+</body>
+</html>
