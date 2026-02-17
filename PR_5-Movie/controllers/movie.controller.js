@@ -44,7 +44,6 @@ const addMovie = async (req, res) => {
         res.redirect("/");
     } catch (error) {
         console.error("Error adding movie:", error);
-        res.status(500).send("Error adding movie");
     }
 };
 
@@ -58,7 +57,6 @@ const editMoviePage = async (req, res) => {
         res.render("edit", { movie });
     } catch (error) {
         console.error("Error fetching movie:", error);
-        res.status(500).send("Error fetching movie");
     }
 };
 
