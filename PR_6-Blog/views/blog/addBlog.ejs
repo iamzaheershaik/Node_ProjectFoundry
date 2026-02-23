@@ -1,0 +1,189 @@
+<!-- ============================================================== -->
+<!-- Add Blog Page -->
+<!-- ============================================================== -->
+
+<!-- Bread crumb -->
+<div class="page-breadcrumb">
+    <div class="row">
+        <div class="col-5 align-self-center">
+            <h4 class="page-title">Add Blog</h4>
+            <div class="d-flex align-items-center">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/dashboard">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="/blog/view">Blogs</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Add Blog</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Breadcrumb -->
+
+<!-- Container fluid -->
+<div class="container-fluid">
+
+    <!-- Flash Messages -->
+    <% if (typeof success !== 'undefined' && success) { %>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <%= success %>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    <% } %>
+    <% if (typeof error !== 'undefined' && error) { %>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <%= error %>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    <% } %>
+
+    <!-- Row -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Add New Blog Post</h4>
+                    <h6 class="card-subtitle mb-3 text-muted">Fill in the details below to create a new blog post.</h6>
+                    <hr>
+
+                    <form action="/blog/add" method="POST" enctype="multipart/form-data" class="mt-4">
+
+                        <div class="row">
+                            <!-- Title -->
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="blogTitle">Blog Title <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="fas fa-heading"></i></span>
+                                        </div>
+                                        <input type="text" class="form-control" id="blogTitle" name="title" placeholder="Enter blog title" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Author Name -->
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="blogAuthor">Author Name <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="fas fa-user-edit"></i></span>
+                                        </div>
+                                        <input type="text" class="form-control" id="blogAuthor" name="authorname" placeholder="Enter author name" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Category -->
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="blogCategory">Category <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="fas fa-tag"></i></span>
+                                        </div>
+                                        <select class="form-control" id="blogCategory" name="category" required>
+                                            <option value="" disabled selected>Select Category</option>
+                                            <option value="Technology">Technology</option>
+                                            <option value="Health">Health</option>
+                                            <option value="Lifestyle">Lifestyle</option>
+                                            <option value="Education">Education</option>
+                                            <option value="Business">Business</option>
+                                            <option value="Travel">Travel</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Publish Date -->
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="blogDate">Publish Date</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="fas fa-calendar-alt"></i></span>
+                                        </div>
+                                        <input type="date" class="form-control" id="blogDate" name="publishDate">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Description -->
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label for="blogDescription">Description <span class="text-danger">*</span></label>
+                                    <textarea class="form-control" id="blogDescription" name="description" rows="6" placeholder="Write blog content here..." required></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Author Image -->
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="authorImage">Author Image</label>
+                                    <div class="custom-file">
+                                        <input type="file" class="custom-file-input" id="authorImage" name="authorImage" accept="image/*">
+                                        <label class="custom-file-label" for="authorImage">Choose file...</label>
+                                    </div>
+                                    <small class="form-text text-muted">Author profile picture. Max: 2MB.</small>
+                                </div>
+                            </div>
+
+                            <!-- Blog Image -->
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="blogImage">Blog Image</label>
+                                    <div class="custom-file">
+                                        <input type="file" class="custom-file-input" id="blogImage" name="blogImage" accept="image/*">
+                                        <label class="custom-file-label" for="blogImage">Choose file...</label>
+                                    </div>
+                                    <small class="form-text text-muted">Featured image for the blog. Max: 2MB.</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- Submit Buttons -->
+                        <div class="form-group mb-0">
+                            <button type="submit" class="btn btn-primary mr-2">
+                                <i class="fas fa-plus-circle mr-1"></i> Publish Blog
+                            </button>
+                            <a href="/blog/view" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left mr-1"></i> Cancel
+                            </a>
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Row -->
+
+</div>
+<!-- End Container fluid -->
+
+<!-- Custom file input label update script -->
+<script>
+    document.querySelectorAll('.custom-file-input').forEach(function (input) {
+        input.addEventListener('change', function (e) {
+            var fileName = e.target.files[0] ? e.target.files[0].name : 'Choose file...';
+            var label = e.target.nextElementSibling;
+            label.textContent = fileName;
+        });
+    });
+</script>

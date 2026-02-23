@@ -1,0 +1,175 @@
+<!-- ============================================================== -->
+<!-- Single Blog View Page -->
+<!-- ============================================================== -->
+
+<!-- Bread crumb -->
+<div class="page-breadcrumb">
+    <div class="row">
+        <div class="col-5 align-self-center">
+            <h4 class="page-title">Blog Details</h4>
+            <div class="d-flex align-items-center">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/dashboard">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="/blog/view">Blogs</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Blog Details</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Breadcrumb -->
+
+<!-- Container fluid -->
+<div class="container-fluid">
+
+    <!-- Flash Messages -->
+    <% if (typeof success !== 'undefined' && success) { %>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <%= success %>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    <% } %>
+    <% if (typeof error !== 'undefined' && error) { %>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <%= error %>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    <% } %>
+
+    <!-- Row -->
+    <div class="row">
+
+        <!-- Blog Image & Author Card (Left) -->
+        <div class="col-lg-4 col-xlg-3">
+            <!-- Blog Image Card -->
+            <div class="card">
+                <div class="card-body text-center">
+                    <% if (typeof blog !== 'undefined' && blog.blogImage) { %>
+                        <img src="/<%= blog.blogImage %>" alt="<%= blog.title %>" class="rounded img-fluid" style="max-height: 250px; object-fit: cover; border: 3px solid #7460ee;">
+                    <% } else { %>
+                        <img src="/assets/images/big/img1.jpg" alt="Default Blog Image" class="rounded img-fluid" style="max-height: 250px; object-fit: cover; border: 3px solid #7460ee;">
+                    <% } %>
+
+                    <h4 class="card-title mt-3 mb-1"><%= blog.title %></h4>
+                    <span class="badge badge-info px-3 py-2"><%= blog.category %></span>
+                </div>
+            </div>
+
+            <!-- Author Card -->
+            <div class="card">
+                <div class="card-body text-center">
+                    <h6 class="card-subtitle text-muted mb-2">Author</h6>
+                    <% if (blog.authorImage) { %>
+                        <img src="/<%= blog.authorImage %>" alt="<%= blog.authorname %>" class="rounded-circle" width="80" height="80" style="object-fit: cover; border: 3px solid #36bea6;">
+                    <% } else { %>
+                        <img src="/assets/images/users/1.jpg" alt="Default Avatar" class="rounded-circle" width="80" height="80" style="object-fit: cover; border: 3px solid #36bea6;">
+                    <% } %>
+                    <h5 class="card-title mt-2 mb-0"><%= blog.authorname %></h5>
+                </div>
+            </div>
+        </div>
+
+        <!-- Blog Details Card (Right) -->
+        <div class="col-lg-8 col-xlg-9">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Blog Information</h4>
+                    <h6 class="card-subtitle mb-3 text-muted">Full details for this blog post.</h6>
+                    <hr>
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped">
+                            <tbody>
+                                <tr>
+                                    <th width="30%" class="bg-light">
+                                        <i class="fas fa-heading text-primary mr-2"></i> Title
+                                    </th>
+                                    <td><%= blog.title %></td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light">
+                                        <i class="fas fa-user-edit text-info mr-2"></i> Author
+                                    </th>
+                                    <td><%= blog.authorname %></td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light">
+                                        <i class="fas fa-tag text-success mr-2"></i> Category
+                                    </th>
+                                    <td><span class="badge badge-info"><%= blog.category %></span></td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light">
+                                        <i class="fas fa-calendar-alt text-warning mr-2"></i> Publish Date
+                                    </th>
+                                    <td><%= blog.publishDate ? new Date(blog.publishDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : 'Not set' %></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Blog Content -->
+                    <div class="mt-4">
+                        <h5 class="font-weight-bold"><i class="fas fa-align-left text-primary mr-2"></i> Blog Content</h5>
+                        <hr>
+                        <div class="p-3 bg-light rounded" style="white-space: pre-wrap; line-height: 1.8;">
+                            <%= blog.description %>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <!-- Action Buttons -->
+                    <div class="form-group mb-0">
+                        <a href="/blog/edit/<%= blog._id %>" class="btn btn-warning mr-2">
+                            <i class="fas fa-edit mr-1"></i> Edit Blog
+                        </a>
+                        <a href="#" class="btn btn-danger mr-2" data-toggle="modal" data-target="#deleteModal">
+                            <i class="fas fa-trash-alt mr-1"></i> Delete Blog
+                        </a>
+                        <a href="/blog/view" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left mr-1"></i> Back to List
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <!-- End Row -->
+
+</div>
+<!-- End Container fluid -->
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteModalLabel">
+                    <i class="fas fa-exclamation-triangle mr-2"></i> Confirm Deletion
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete the blog post <strong>"<%= blog.title %>"</strong>?</p>
+                <p class="text-danger mb-0"><small>This action cannot be undone.</small></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <a href="/blog/delete/<%= blog._id %>" class="btn btn-danger">
+                    <i class="fas fa-trash-alt mr-1"></i> Delete
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

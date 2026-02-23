@@ -1,0 +1,172 @@
+<!-- ============================================================== -->
+<!-- Single Admin View Page -->
+<!-- ============================================================== -->
+
+<!-- Bread crumb and target page title -->
+<div class="page-breadcrumb">
+    <div class="row">
+        <div class="col-5 align-self-center">
+            <h4 class="page-title">Admin Profile</h4>
+            <div class="d-flex align-items-center">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/dashboard">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="/admin/view-admin">Admins</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Admin Profile</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Breadcrumb -->
+
+<!-- Container fluid -->
+<div class="container-fluid">
+
+    <!-- Flash Messages -->
+    <% if (typeof success !== 'undefined' && success) { %>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <%= success %>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    <% } %>
+    <% if (typeof error !== 'undefined' && error) { %>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <%= error %>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    <% } %>
+
+    <!-- Row -->
+    <div class="row">
+
+        <!-- Profile Card (Left) -->
+        <div class="col-lg-4 col-xlg-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <!-- Profile Image -->
+                    <% if (typeof admin !== 'undefined' && admin.profileImage) { %>
+                        <img src="<%= admin.profileImage %>" alt="<%= admin.firstname %>" class="rounded-circle" width="150" height="150" style="object-fit: cover; border: 4px solid #7460ee;">
+                    <% } else { %>
+                        <img src="/assets/images/users/1.jpg" alt="Default Avatar" class="rounded-circle" width="150" height="150" style="object-fit: cover; border: 4px solid #7460ee;">
+                    <% } %>
+
+                    <h4 class="card-title mt-3 mb-1"><%= admin.firstname %> <%= admin.lastname %></h4>
+                    <h6 class="card-subtitle text-muted"><%= admin.email %></h6>
+
+                    <!-- Gender Badge -->
+                    <div class="mt-3">
+                        <% if (admin.gender === 'Male') { %>
+                            <span class="badge badge-info badge-pill px-3 py-2">
+                                <i class="fas fa-mars mr-1"></i> Male
+                            </span>
+                        <% } else if (admin.gender === 'Female') { %>
+                            <span class="badge badge-pink badge-pill px-3 py-2" style="background-color: #e83e8c; color: #fff;">
+                                <i class="fas fa-venus mr-1"></i> Female
+                            </span>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Details Card (Right) -->
+        <div class="col-lg-8 col-xlg-9">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Admin Information</h4>
+                    <h6 class="card-subtitle mb-3 text-muted">Detailed profile information for this admin account.</h6>
+                    <hr>
+
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped">
+                            <tbody>
+                                <tr>
+                                    <th width="30%" class="bg-light">
+                                        <i class="fas fa-user text-primary mr-2"></i> First Name
+                                    </th>
+                                    <td><%= admin.firstname %></td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light">
+                                        <i class="fas fa-user text-primary mr-2"></i> Last Name
+                                    </th>
+                                    <td><%= admin.lastname %></td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light">
+                                        <i class="fas fa-envelope text-info mr-2"></i> Email Address
+                                    </th>
+                                    <td><a href="mailto:<%= admin.email %>"><%= admin.email %></a></td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light">
+                                        <i class="fas fa-venus-mars text-warning mr-2"></i> Gender
+                                    </th>
+                                    <td><%= admin.gender || 'Not specified' %></td>
+                                </tr>
+                                <tr>
+                                    <th class="bg-light">
+                                        <i class="fas fa-phone text-success mr-2"></i> Mobile Number
+                                    </th>
+                                    <td><%= admin.mobileNo || 'Not provided' %></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <hr>
+
+                    <!-- Action Buttons -->
+                    <div class="form-group mb-0">
+                        <a href="/admin/edit-admin/<%= admin._id %>" class="btn btn-warning mr-2">
+                            <i class="fas fa-edit mr-1"></i> Edit Admin
+                        </a>
+                        <a href="#" class="btn btn-danger mr-2" data-toggle="modal" data-target="#deleteModal">
+                            <i class="fas fa-trash-alt mr-1"></i> Delete Admin
+                        </a>
+                        <a href="/admin/view-admin" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left mr-1"></i> Back to List
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <!-- End Row -->
+
+</div>
+<!-- End Container fluid -->
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteModalLabel">
+                    <i class="fas fa-exclamation-triangle mr-2"></i> Confirm Deletion
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete the admin <strong>"<%= admin.firstname %> <%= admin.lastname %>"</strong>?</p>
+                <p class="text-danger mb-0"><small>This action cannot be undone.</small></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <a href="/admin/delete-admin/<%= admin._id %>" class="btn btn-danger">
+                    <i class="fas fa-trash-alt mr-1"></i> Delete
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

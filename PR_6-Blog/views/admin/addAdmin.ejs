@@ -1,0 +1,188 @@
+<!-- ============================================================== -->
+<!-- Add Admin Page -->
+<!-- ============================================================== -->
+
+<!-- Bread crumb and target page title -->
+<div class="page-breadcrumb">
+    <div class="row">
+        <div class="col-5 align-self-center">
+            <h4 class="page-title">Add Admin</h4>
+            <div class="d-flex align-items-center">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/dashboard">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="/admin/view-admin">Admins</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Add Admin</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Breadcrumb -->
+
+<!-- Container fluid -->
+<div class="container-fluid">
+
+    <!-- Flash Messages -->
+    <% if (typeof success !== 'undefined' && success) { %>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <%= success %>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    <% } %>
+    <% if (typeof error !== 'undefined' && error) { %>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <%= error %>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    <% } %>
+
+    <!-- Row -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Add New Admin</h4>
+                    <h6 class="card-subtitle mb-3 text-muted">Fill in the details below to create a new admin account.</h6>
+                    <hr>
+
+                    <form action="/admin/add-admin" method="POST" enctype="multipart/form-data" class="mt-4">
+
+                        <div class="row">
+                            <!-- First Name -->
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="adminFirstname">First Name <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                        </div>
+                                        <input type="text" class="form-control" id="adminFirstname" name="firstname" placeholder="Enter first name" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Last Name -->
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="adminLastname">Last Name <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="fas fa-user"></i></span>
+                                        </div>
+                                        <input type="text" class="form-control" id="adminLastname" name="lastname" placeholder="Enter last name" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Email -->
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="adminEmail">Email Address <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                        </div>
+                                        <input type="email" class="form-control" id="adminEmail" name="email" placeholder="Enter email address" required>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Password -->
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="adminPassword">Password <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                        </div>
+                                        <input type="password" class="form-control" id="adminPassword" name="password" placeholder="Enter password" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Gender -->
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="adminGender">Gender <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="fas fa-venus-mars"></i></span>
+                                        </div>
+                                        <select class="form-control" id="adminGender" name="gender" required>
+                                            <option value="" disabled selected>Select Gender</option>
+                                            <option value="Male">Male</option>
+                                            <option value="Female">Female</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Mobile No -->
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="adminMobile">Mobile Number</label>
+                                    <div class="input-group">
+                                        <div class="input-group-prepend">
+                                            <span class="input-group-text"><i class="fas fa-phone"></i></span>
+                                        </div>
+                                        <input type="tel" class="form-control" id="adminMobile" name="mobileNo" placeholder="Enter mobile number">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Profile Image -->
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="adminImage">Profile Image</label>
+                                    <div class="custom-file">
+                                        <input type="file" class="custom-file-input" id="adminImage" name="profileImage" accept="image/*">
+                                        <label class="custom-file-label" for="adminImage">Choose file...</label>
+                                    </div>
+                                    <small class="form-text text-muted">Accepted formats: JPG, PNG, GIF. Max size: 2MB.</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr>
+
+                        <!-- Submit Buttons -->
+                        <div class="form-group mb-0">
+                            <button type="submit" class="btn btn-primary mr-2">
+                                <i class="fas fa-plus-circle mr-1"></i> Add Admin
+                            </button>
+                            <a href="/admin/view-admin" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left mr-1"></i> Cancel
+                            </a>
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Row -->
+
+</div>
+<!-- End Container fluid -->
+
+<!-- Custom file input label update script -->
+<script>
+    document.querySelector('.custom-file-input').addEventListener('change', function (e) {
+        var fileName = e.target.files[0] ? e.target.files[0].name : 'Choose file...';
+        var label = e.target.nextElementSibling;
+        label.textContent = fileName;
+    });
+</script>

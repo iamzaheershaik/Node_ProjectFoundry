@@ -1,0 +1,81 @@
+<!-- ============================================================== -->
+<!-- Dashboard Page -->
+<!-- ============================================================== -->
+
+<!-- Bread crumb -->
+<div class="page-breadcrumb">
+    <div class="row">
+        <div class="col-5 align-self-center">
+            <h4 class="page-title">Dashboard</h4>
+            <div class="d-flex align-items-center">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Breadcrumb -->
+
+<!-- Container fluid -->
+<div class="container-fluid">
+
+    <!-- Flash Messages -->
+    <% if (typeof success !== 'undefined' && success) { %>
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <%= success %>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    <% } %>
+    <% if (typeof error !== 'undefined' && error) { %>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <%= error %>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    <% } %>
+
+    <!-- Welcome Card -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Welcome, <strong><%= user.firstname %> <%= user.lastname %></strong>!</h4>
+                    <h6 class="card-subtitle text-muted">Logged in as: <%= user.email %></h6>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions Row -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Quick Actions</h4>
+                    <div class="d-flex flex-wrap">
+                        <a href="/blog/add" class="btn btn-primary mr-2 mb-2">
+                            <i class="mdi mdi-plus mr-1"></i> New Blog Post
+                        </a>
+                        <a href="/admin/add-admin" class="btn btn-info mr-2 mb-2">
+                            <i class="mdi mdi-account-plus mr-1"></i> Add Admin
+                        </a>
+                        <a href="/blog/view" class="btn btn-success mr-2 mb-2">
+                            <i class="mdi mdi-file-document-box mr-1"></i> View All Blogs
+                        </a>
+                        <a href="/admin/view-admin" class="btn btn-warning mr-2 mb-2">
+                            <i class="mdi mdi-account-group mr-1"></i> View All Admins
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<!-- End Container fluid -->
