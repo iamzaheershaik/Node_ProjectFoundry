@@ -54,6 +54,20 @@
                     <h4 class="card-title">All Blog Posts</h4>
                     <h6 class="card-subtitle mb-3 text-muted">List of all blog posts in the system.</h6>
 
+                    <!-- Search Bar -->
+                    <form method="GET" action="/blog/view" class="mb-3">
+                        <div class="input-group">
+                            <input type="text" name="search" class="form-control" placeholder="Search by title, author, category or description..." value="<%= typeof search !== 'undefined' ? search : '' %>">
+                            <div class="input-group-append">
+                                <button type="submit" class="btn btn-primary"><i class="fas fa-search mr-1"></i>Search</button>
+                                <% if (typeof search !== 'undefined' && search) { %>
+                                    <a href="/blog/view" class="btn btn-secondary"><i class="fas fa-times mr-1"></i>Clear</a>
+                                <% } %>
+                            </div>
+                        </div>
+                    </form>
+                    <!-- End Search Bar -->
+
                     <div class="table-responsive">
                         <table class="table table-bordered table-striped">
                             <thead class="thead-light">
@@ -100,7 +114,11 @@
                                     <tr>
                                         <td colspan="7" class="text-center text-muted py-4">
                                             <i class="mdi mdi-file-document-box-remove-outline font-24 d-block mb-2"></i>
-                                            No blog posts found. <a href="/blog/add">Create one now</a>.
+                                            <% if (typeof search !== 'undefined' && search) { %>
+                                                No blog posts found matching "<strong><%= search %></strong>". <a href="/blog/view">View all blogs</a>.
+                                            <% } else { %>
+                                                No blog posts found. <a href="/blog/add">Create one now</a>.
+                                            <% } %>
                                         </td>
                                     </tr>
                                 <% } %>

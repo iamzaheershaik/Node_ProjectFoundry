@@ -1,15 +1,11 @@
 const express = require("express");
 const router = express.Router();
 
-// Controllers
 const authController = require("../controller/auth.controller");
 
-// Middleware
+
 const uploadImage = require("../middleware/uploadImage.multer");
 
-// =============================================
-// Auth Routes
-// =============================================
 router.get("/", authController.loginPage);
 router.get("/login", authController.loginPage);
 router.get("/register", authController.registerPage);

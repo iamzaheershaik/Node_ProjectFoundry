@@ -6,9 +6,21 @@ exports.viewAllBlogs = async (req, res) => {
     try {
         if (req.cookies && req.cookies.admin && req.cookies.admin._id != undefined)
         {
-            let blogs = await Blog.find();
+            let search = req.query.search || "";
+            let query = {};
+            if (search) {
+                query = {
+                    $or: [
+                        { title: { $regex: search, $options: "i" } },
+                        { authorname: { $regex: search, $options: "i" } },
+                        { category: { $regex: search, $options: "i" } },
+                        { description: { $regex: search, $options: "i" } }
+                    ]
+                };
+            }
+            let blogs = await Blog.find(query);
             let user = req.cookies.admin;
-            return res.render("blog/viewBlog", { blogs, user });
+            return res.render("blog/viewBlog", { blogs, user, search });
         } else {
             return res.redirect("/");
         }
