@@ -5,7 +5,7 @@ const passport = require("../middleware/passport-local-strategy");
 const authController = require("../controller/auth.controller");
 const uploadImage = require("../middleware/uploadImage.multer");
 
-// Public routes (no authentication required)
+
 router.get("/", authController.loginPage);
 router.get("/login", authController.loginPage);
 router.get("/register", authController.registerPage);
