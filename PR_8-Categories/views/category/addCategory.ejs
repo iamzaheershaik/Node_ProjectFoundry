@@ -1,176 +1,115 @@
-<!DOCTYPE html>
-<html dir="ltr" lang="en">
+<%- include('../partials/head') %>
+    <%- include('../partials/layout_open') %>
 
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Blog Admin Panel">
-    <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon.png">
-    <title>Blog Admin Panel</title>
-    <link href="/assets/libs/toastr/build/toastr.min.css" rel="stylesheet">
-    <link href="/dist/css/style.min.css" rel="stylesheet">
-</head>
-
-<body>
-    <div class="preloader">
-        <div class="lds-ripple">
-            <div class="lds-pos"></div>
-            <div class="lds-pos"></div>
+        <!-- Bread crumb -->
+        <div class="page-breadcrumb">
+            <div class="row">
+                <div class="col-5 align-self-center">
+                    <h4 class="page-title">Add Category</h4>
+                    <div class="d-flex align-items-center">
+                        <nav aria-label="breadcrumb">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item"><a href="/dashboard">Dashboard</a></li>
+                                <li class="breadcrumb-item"><a href="/category/view">Categories</a></li>
+                                <li class="breadcrumb-item active" aria-current="page">Add Category</li>
+                            </ol>
+                        </nav>
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
-    <div id="main-wrapper" data-layout="vertical" data-navbarbg="skin5" data-sidebartype="full"
-        data-sidebar-position="absolute" data-header-position="absolute" data-boxed-layout="full">
-        <%- include('../header') %>
-            <div class="page-wrapper">
-                <!-- ============================================================== -->
-                <!-- Add Category Page -->
-                <!-- ============================================================== -->
+        <!-- End Breadcrumb -->
 
-                <!-- Bread crumb -->
-                <div class="page-breadcrumb">
-                    <div class="row">
-                        <div class="col-5 align-self-center">
-                            <h4 class="page-title">Add Category</h4>
-                            <div class="d-flex align-items-center">
-                                <nav aria-label="breadcrumb">
-                                    <ol class="breadcrumb">
-                                        <li class="breadcrumb-item"><a href="/dashboard">Dashboard</a></li>
-                                        <li class="breadcrumb-item"><a href="/category/view">Categories</a></li>
-                                        <li class="breadcrumb-item active" aria-current="page">Add Category</li>
-                                    </ol>
-                                </nav>
+        <!-- Container fluid -->
+        <div class="container-fluid">
+
+            <%- include('../partials/flash_messages') %>
+
+                <!-- Row -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <h4 class="card-title">Add New Category</h4>
+                                <h6 class="card-subtitle mb-3 text-muted">Fill in the details below
+                                    to create a new category.</h6>
+                                <hr>
+
+                                <form action="/category/add" method="POST" enctype="multipart/form-data" class="mt-4">
+
+                                    <div class="row">
+                                        <!-- Category Name -->
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="categoryName">Category Name <span
+                                                        class="text-danger">*</span></label>
+                                                <div class="input-group">
+                                                    <div class="input-group-prepend">
+                                                        <span class="input-group-text"><i class="fas fa-tag"></i></span>
+                                                    </div>
+                                                    <input type="text" class="form-control" id="categoryName"
+                                                        name="name" placeholder="Enter category name" required>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Category Image -->
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="categoryImage">Category Image</label>
+                                                <div class="custom-file">
+                                                    <input type="file" class="custom-file-input" id="categoryImage"
+                                                        name="categoryImage" accept="image/*">
+                                                    <label class="custom-file-label" for="categoryImage">Choose
+                                                        file...</label>
+                                                </div>
+                                                <small class="form-text text-muted">Accepted
+                                                    formats: JPG, PNG, GIF. Max size: 2MB.</small>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <!-- Description -->
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label for="categoryDescription">Description</label>
+                                                <textarea class="form-control" id="categoryDescription"
+                                                    name="description" rows="4"
+                                                    placeholder="Write category description here..."></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <hr>
+
+                                    <!-- Submit Buttons -->
+                                    <div class="form-group mb-0">
+                                        <button type="submit" class="btn btn-primary mr-2">
+                                            <i class="fas fa-plus-circle mr-1"></i> Add Category
+                                        </button>
+                                        <a href="/category/view" class="btn btn-secondary">
+                                            <i class="fas fa-arrow-left mr-1"></i> Cancel
+                                        </a>
+                                    </div>
+
+                                </form>
+
                             </div>
                         </div>
                     </div>
                 </div>
-                <!-- End Breadcrumb -->
+                <!-- End Row -->
 
-                <!-- Container fluid -->
-                <div class="container-fluid">
+        </div>
+        <!-- End Container fluid -->
 
-                    <!-- Flash Messages -->
-                    <% if (typeof success !=='undefined' && success) { %>
-                        <div class="alert alert-success alert-dismissible fade show" role="alert">
-                            <%= success %>
-                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                        </div>
-                        <% } %>
-                            <% if (typeof error !=='undefined' && error) { %>
-                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                    <%= error %>
-                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
-                                </div>
-                                <% } %>
-
-                                    <!-- Row -->
-                                    <div class="row">
-                                        <div class="col-12">
-                                            <div class="card">
-                                                <div class="card-body">
-                                                    <h4 class="card-title">Add New Category</h4>
-                                                    <h6 class="card-subtitle mb-3 text-muted">Fill in the details below
-                                                        to create a new category.</h6>
-                                                    <hr>
-
-                                                    <form action="/category/add" method="POST" enctype="multipart/form-data"
-                                                        class="mt-4">
-
-                                                        <div class="row">
-                                                            <!-- Category Name -->
-                                                            <div class="col-md-6">
-                                                                <div class="form-group">
-                                                                    <label for="categoryName">Category Name <span
-                                                                            class="text-danger">*</span></label>
-                                                                    <div class="input-group">
-                                                                        <div class="input-group-prepend">
-                                                                            <span class="input-group-text"><i
-                                                                                    class="fas fa-tag"></i></span>
-                                                                        </div>
-                                                                        <input type="text" class="form-control"
-                                                                            id="categoryName" name="name"
-                                                                            placeholder="Enter category name" required>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-
-                                                            <!-- Category Image -->
-                                                            <div class="col-md-6">
-                                                                <div class="form-group">
-                                                                    <label for="categoryImage">Category Image</label>
-                                                                    <div class="custom-file">
-                                                                        <input type="file" class="custom-file-input"
-                                                                            id="categoryImage" name="categoryImage"
-                                                                            accept="image/*">
-                                                                        <label class="custom-file-label"
-                                                                            for="categoryImage">Choose file...</label>
-                                                                    </div>
-                                                                    <small class="form-text text-muted">Category
-                                                                        image. Max: 2MB.</small>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                        <div class="row">
-                                                            <!-- Description -->
-                                                            <div class="col-md-12">
-                                                                <div class="form-group">
-                                                                    <label for="categoryDescription">Description</label>
-                                                                    <textarea class="form-control" id="categoryDescription"
-                                                                        name="description" rows="4"
-                                                                        placeholder="Write category description here..."></textarea>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-
-                                                        <hr>
-
-                                                        <!-- Submit Buttons -->
-                                                        <div class="form-group mb-0">
-                                                            <button type="submit" class="btn btn-primary mr-2">
-                                                                <i class="fas fa-plus-circle mr-1"></i> Add Category
-                                                            </button>
-                                                            <a href="/category/view" class="btn btn-secondary">
-                                                                <i class="fas fa-arrow-left mr-1"></i> Cancel
-                                                            </a>
-                                                        </div>
-
-                                                    </form>
-
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- End Row -->
-
-                </div>
-                <!-- End Container fluid -->
-
-                <!-- Custom file input label update script -->
-                <script>
-                    document.querySelectorAll('.custom-file-input').forEach(function (input) {
-                        input.addEventListener('change', function (e) {
-                            var fileName = e.target.files[0] ? e.target.files[0].name : 'Choose file...';
-                            var label = e.target.nextElementSibling;
-                            label.textContent = fileName;
-                        });
-                    });
-                </script>
-                <%- include('../footer') %>
-            </div>
-    </div>
-    <script src="/assets/libs/jquery/dist/jquery.min.js"></script>
-    <script src="/assets/libs/popper.js/dist/umd/popper.min.js"></script>
-    <script src="/assets/libs/bootstrap/dist/js/bootstrap.min.js"></script>
-    <script src="/dist/js/app-style-switcher.js"></script>
-    <script src="/dist/js/waves.js"></script>
-    <script src="/dist/js/sidebarmenu.js"></script>
-    <script src="/dist/js/custom.js"></script>
-    <script src="/assets/libs/toastr/build/toastr.min.js"></script>
-</body>
-
-</html>
+        <!-- Custom file input label update script -->
+        <script>
+            document.querySelector('.custom-file-input').addEventListener('change', function (e) {
+                var fileName = e.target.files[0] ? e.target.files[0].name : 'Choose file...';
+                var label = e.target.nextElementSibling;
+                label.textContent = fileName;
+            });
+        </script>
+        <%- include('../partials/layout_close') %>

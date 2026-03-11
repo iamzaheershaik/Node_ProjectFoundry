@@ -36,7 +36,8 @@
                                 <nav aria-label="breadcrumb">
                                     <ol class="breadcrumb">
                                         <li class="breadcrumb-item"><a href="/dashboard">Dashboard</a></li>
-                                        <li class="breadcrumb-item"><a href="/extracategory/view">ExtraCategories</a></li>
+                                        <li class="breadcrumb-item"><a href="/extracategory/view">ExtraCategories</a>
+                                        </li>
                                         <li class="breadcrumb-item active" aria-current="page">Edit ExtraCategory</li>
                                     </ol>
                                 </nav>
@@ -78,137 +79,227 @@
                                                     <hr>
 
                                                     <!-- Current Image Preview -->
-                                                    <% if (typeof extracategory !=='undefined' && extracategory.extracategoryImage) { %>
+                                                    <% if (typeof extracategory !=='undefined' &&
+                                                        extracategory.extracategoryImage) { %>
                                                         <div class="text-center mb-4">
-                                                            <img src="<%= extracategory.extracategoryImage %>" alt="<%= extracategory.name %>"
-                                                                class="rounded" width="200" height="120"
+                                                            <img src="<%= extracategory.extracategoryImage %>"
+                                                                alt="<%= extracategory.name %>" class="rounded"
+                                                                width="200" height="120"
                                                                 style="object-fit: cover; border: 3px solid #7460ee;">
-                                                            <p class="mt-2 text-muted"><small>Current extra category image</small></p>
+                                                            <p class="mt-2 text-muted"><small>Current extra category
+                                                                    image</small></p>
                                                         </div>
-                                                    <% } %>
+                                                        <% } %>
 
-                                                    <form action="/extracategory/edit/<%= extracategory._id %>" method="POST"
-                                                        enctype="multipart/form-data" class="mt-4">
+                                                            <form action="/extracategory/edit/<%= extracategory._id %>"
+                                                                method="POST" enctype="multipart/form-data"
+                                                                class="mt-4">
 
-                                                        <div class="row">
-                                                            <!-- Parent Category (cascading) -->
-                                                            <div class="col-md-6">
-                                                                <div class="form-group">
-                                                                    <label for="parentCategory">Parent Category <span
-                                                                            class="text-danger">*</span></label>
-                                                                    <div class="input-group">
-                                                                        <div class="input-group-prepend">
-                                                                            <span class="input-group-text"><i
-                                                                                    class="fas fa-folder"></i></span>
+                                                                <div class="row">
+                                                                    <!-- Parent Category (cascading) -->
+                                                                    <div class="col-md-6">
+                                                                        <div class="form-group">
+                                                                            <label for="parentCategory">Parent Category
+                                                                                <span
+                                                                                    class="text-danger">*</span></label>
+                                                                            <div class="input-group">
+                                                                                <div class="input-group-prepend">
+                                                                                    <span class="input-group-text"><i
+                                                                                            class="fas fa-folder"></i></span>
+                                                                                </div>
+                                                                                <select class="form-control"
+                                                                                    id="parentCategory" required>
+                                                                                    <option value="" disabled>Select
+                                                                                        Parent Category</option>
+                                                                                    <% if (typeof categories
+                                                                                        !=='undefined' &&
+                                                                                        categories.length> 0) { %>
+                                                                                        <% categories.forEach(function(cat)
+                                                                                            { %>
+                                                                                            <option
+                                                                                                value="<%= cat._id %>"
+                                                                                                <%=(extracategory.subcategory
+                                                                                                &&
+                                                                                                extracategory.subcategory.category
+                                                                                                &&
+                                                                                                extracategory.subcategory.category._id.toString()===cat._id.toString())
+                                                                                                ? 'selected' : '' %>><%=
+                                                                                                    cat.name %>
+                                                                                            </option>
+                                                                                            <% }) %>
+                                                                                                <% } %>
+                                                                                </select>
+                                                                            </div>
                                                                         </div>
-                                                                        <select class="form-control" id="parentCategory"
-                                                                            required>
-                                                                            <option value="" disabled>Select Parent Category</option>
-                                                                            <% if (typeof categories !== 'undefined' && categories.length > 0) { %>
-                                                                                <% categories.forEach(function(cat) { %>
-                                                                                    <option value="<%= cat._id %>"
-                                                                                        <%= (extracategory.subcategory && extracategory.subcategory.category && extracategory.subcategory.category._id.toString() === cat._id.toString()) ? 'selected' : '' %>><%= cat.name %></option>
-                                                                                <% }) %>
-                                                                            <% } %>
-                                                                        </select>
                                                                     </div>
-                                                                </div>
-                                                            </div>
 
-                                                            <!-- Parent Subcategory (cascading) -->
-                                                            <div class="col-md-6">
-                                                                <div class="form-group">
-                                                                    <label for="parentSubcategory">Parent Subcategory <span
-                                                                            class="text-danger">*</span></label>
-                                                                    <div class="input-group">
-                                                                        <div class="input-group-prepend">
-                                                                            <span class="input-group-text"><i
-                                                                                    class="fas fa-folder-open"></i></span>
+                                                                    <!-- Parent Subcategory (cascading) -->
+                                                                    <div class="col-md-6">
+                                                                        <div class="form-group">
+                                                                            <label for="parentSubcategory">Parent
+                                                                                Subcategory <span
+                                                                                    class="text-danger">*</span></label>
+                                                                            <div class="input-group">
+                                                                                <div class="input-group-prepend">
+                                                                                    <span class="input-group-text"><i
+                                                                                            class="fas fa-folder-open"></i></span>
+                                                                                </div>
+                                                                                <select class="form-control"
+                                                                                    id="parentSubcategory"
+                                                                                    name="subcategory" required>
+                                                                                    <option value="" disabled>Select
+                                                                                        Parent Subcategory</option>
+                                                                                    <% if (typeof subcategories
+                                                                                        !=='undefined' &&
+                                                                                        subcategories.length> 0) { %>
+                                                                                        <% subcategories.forEach(function(sub)
+                                                                                            { %>
+                                                                                            <% if
+                                                                                                (extracategory.subcategory
+                                                                                                &&
+                                                                                                extracategory.subcategory.category
+                                                                                                && sub.category &&
+                                                                                                sub.category._id.toString()===extracategory.subcategory.category._id.toString())
+                                                                                                { %>
+                                                                                                <option
+                                                                                                    value="<%= sub._id %>"
+                                                                                                    <%=(extracategory.subcategory
+                                                                                                    &&
+                                                                                                    extracategory.subcategory._id.toString()===sub._id.toString())
+                                                                                                    ? 'selected' : '' %>
+                                                                                                    ><%= sub.name %>
+                                                                                                </option>
+                                                                                                <% } %>
+                                                                                                    <% }) %>
+                                                                                                        <% } %>
+                                                                                </select>
+                                                                            </div>
                                                                         </div>
-                                                                        <select class="form-control" id="parentSubcategory"
-                                                                            name="subcategory" required>
-                                                                            <option value="" disabled>Select Parent Subcategory</option>
-                                                                            <% if (typeof subcategories !== 'undefined' && subcategories.length > 0) { %>
-                                                                                <% subcategories.forEach(function(sub) { %>
-                                                                                    <% if (extracategory.subcategory && extracategory.subcategory.category && sub.category && sub.category._id.toString() === extracategory.subcategory.category._id.toString()) { %>
-                                                                                        <option value="<%= sub._id %>"
-                                                                                            <%= (extracategory.subcategory && extracategory.subcategory._id.toString() === sub._id.toString()) ? 'selected' : '' %>><%= sub.name %></option>
-                                                                                    <% } %>
-                                                                                <% }) %>
-                                                                            <% } %>
-                                                                        </select>
                                                                     </div>
                                                                 </div>
-                                                            </div>
-                                                        </div>
 
-                                                        <div class="row">
-                                                            <!-- ExtraCategory Name -->
-                                                            <div class="col-md-6">
-                                                                <div class="form-group">
-                                                                    <label for="extracategoryName">ExtraCategory Name <span
-                                                                            class="text-danger">*</span></label>
-                                                                    <div class="input-group">
-                                                                        <div class="input-group-prepend">
-                                                                            <span class="input-group-text"><i
-                                                                                    class="fas fa-tag"></i></span>
+                                                                <div class="row">
+                                                                    <!-- ExtraCategory Name -->
+                                                                    <div class="col-md-6">
+                                                                        <div class="form-group">
+                                                                            <label for="extracategoryName">ExtraCategory
+                                                                                Name <span
+                                                                                    class="text-danger">*</span></label>
+                                                                            <div class="input-group">
+                                                                                <div class="input-group-prepend">
+                                                                                    <span class="input-group-text"><i
+                                                                                            class="fas fa-tag"></i></span>
+                                                                                </div>
+                                                                                <input type="text" class="form-control"
+                                                                                    id="extracategoryName" name="name"
+                                                                                    value="<%= extracategory.name %>"
+                                                                                    placeholder="Enter extra category name"
+                                                                                    required>
+                                                                            </div>
                                                                         </div>
-                                                                        <input type="text" class="form-control"
-                                                                            id="extracategoryName" name="name"
-                                                                            value="<%= extracategory.name %>"
-                                                                            placeholder="Enter extra category name"
-                                                                            required>
+                                                                    </div>
+
+                                                                    <!-- ExtraCategory Image -->
+                                                                    <div class="col-md-6">
+                                                                        <div class="form-group">
+                                                                            <label
+                                                                                for="extracategoryImage">ExtraCategory
+                                                                                Image</label>
+                                                                            <div class="custom-file">
+                                                                                <input type="file"
+                                                                                    class="custom-file-input"
+                                                                                    id="extracategoryImage"
+                                                                                    name="extracategoryImage"
+                                                                                    accept="image/*">
+                                                                                <label class="custom-file-label"
+                                                                                    for="extracategoryImage">Choose new
+                                                                                    file...</label>
+                                                                            </div>
+                                                                            <small class="form-text text-muted">Leave
+                                                                                empty to keep the current image. Max:
+                                                                                2MB.</small>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
-                                                            </div>
 
-                                                            <!-- ExtraCategory Image -->
-                                                            <div class="col-md-6">
-                                                                <div class="form-group">
-                                                                    <label for="extracategoryImage">ExtraCategory Image</label>
-                                                                    <div class="custom-file">
-                                                                        <input type="file"
-                                                                            class="custom-file-input"
-                                                                            id="extracategoryImage" name="extracategoryImage"
-                                                                            accept="image/*">
-                                                                        <label class="custom-file-label"
-                                                                            for="extracategoryImage">Choose new file...</label>
+                                                                <div class="row">
+                                                                    <!-- Price -->
+                                                                    <div class="col-md-6">
+                                                                        <div class="form-group">
+                                                                            <label for="extracategoryPrice">Price <span
+                                                                                    class="text-danger">*</span></label>
+                                                                            <div class="input-group">
+                                                                                <div class="input-group-prepend">
+                                                                                    <span class="input-group-text"><i
+                                                                                            class="fas fa-rupee-sign"></i></span>
+                                                                                </div>
+                                                                                <input type="number"
+                                                                                    class="form-control"
+                                                                                    id="extracategoryPrice" name="price"
+                                                                                    value="<%= extracategory.price %>"
+                                                                                    placeholder="Enter price" min="0"
+                                                                                    required>
+                                                                            </div>
+                                                                        </div>
                                                                     </div>
-                                                                    <small class="form-text text-muted">Leave empty to keep the current image. Max: 2MB.</small>
+
+                                                                    <!-- Quantity -->
+                                                                    <div class="col-md-6">
+                                                                        <div class="form-group">
+                                                                            <label for="extracategoryQuantity">Quantity
+                                                                                <span
+                                                                                    class="text-danger">*</span></label>
+                                                                            <div class="input-group">
+                                                                                <div class="input-group-prepend">
+                                                                                    <span class="input-group-text"><i
+                                                                                            class="fas fa-boxes"></i></span>
+                                                                                </div>
+                                                                                <input type="number"
+                                                                                    class="form-control"
+                                                                                    id="extracategoryQuantity"
+                                                                                    name="quantity"
+                                                                                    value="<%= extracategory.quantity %>"
+                                                                                    placeholder="Enter quantity" min="0"
+                                                                                    required>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
                                                                 </div>
-                                                            </div>
-                                                        </div>
 
-                                                        <div class="row">
-                                                            <!-- Description -->
-                                                            <div class="col-md-12">
-                                                                <div class="form-group">
-                                                                    <label for="extracategoryDescription">Description</label>
-                                                                    <textarea class="form-control"
-                                                                        id="extracategoryDescription" name="description"
-                                                                        rows="4"
-                                                                        placeholder="Write extra category description here..."><%= extracategory.description %></textarea>
+                                                                <div class="row">
+                                                                    <!-- Description -->
+                                                                    <div class="col-md-12">
+                                                                        <div class="form-group">
+                                                                            <label
+                                                                                for="extracategoryDescription">Description</label>
+                                                                            <textarea class="form-control"
+                                                                                id="extracategoryDescription"
+                                                                                name="description" rows="4"
+                                                                                placeholder="Write extra category description here..."><%= extracategory.description %></textarea>
+                                                                        </div>
+                                                                    </div>
                                                                 </div>
-                                                            </div>
-                                                        </div>
 
-                                                        <hr>
+                                                                <hr>
 
-                                                        <!-- Submit Buttons -->
-                                                        <div class="form-group mb-0">
-                                                            <button type="submit" class="btn btn-warning mr-2">
-                                                                <i class="fas fa-save mr-1"></i> Update ExtraCategory
-                                                            </button>
-                                                            <a href="/extracategory/view/<%= extracategory._id %>"
-                                                                class="btn btn-info mr-2">
-                                                                <i class="fas fa-eye mr-1"></i> View ExtraCategory
-                                                            </a>
-                                                            <a href="/extracategory/view" class="btn btn-secondary">
-                                                                <i class="fas fa-arrow-left mr-1"></i> Cancel
-                                                            </a>
-                                                        </div>
+                                                                <!-- Submit Buttons -->
+                                                                <div class="form-group mb-0">
+                                                                    <button type="submit" class="btn btn-warning mr-2">
+                                                                        <i class="fas fa-save mr-1"></i> Update
+                                                                        ExtraCategory
+                                                                    </button>
+                                                                    <a href="/extracategory/view/<%= extracategory._id %>"
+                                                                        class="btn btn-info mr-2">
+                                                                        <i class="fas fa-eye mr-1"></i> View
+                                                                        ExtraCategory
+                                                                    </a>
+                                                                    <a href="/extracategory/view"
+                                                                        class="btn btn-secondary">
+                                                                        <i class="fas fa-arrow-left mr-1"></i> Cancel
+                                                                    </a>
+                                                                </div>
 
-                                                    </form>
+                                                            </form>
 
                                                 </div>
                                             </div>
@@ -243,37 +334,28 @@
 
     <!-- Cascading Dropdown Script: Category → Subcategory -->
     <script>
-        $(document).ready(function() {
-            // Store all subcategories for reference
-            var allSubcategories = <%= JSON.stringify(subcategories) %>;
+        // Store all subcategories for reference
+        var allSubcategories = <%= JSON.stringify(subcategories) %>;
 
-            $('#parentCategory').on('change', function() {
-                var categoryId = $(this).val();
-                var subcategorySelect = $('#parentSubcategory');
+        let categoryId = document.querySelector('#parentCategory');
+        let subCategoryId = document.querySelector('#parentSubcategory');
 
-                // Clear existing options
-                subcategorySelect.html('<option value="" disabled selected>Loading...</option>');
+        categoryId.addEventListener('change', () => {
+            let category = categoryId.value;
 
-                if (categoryId) {
-                    $.ajax({
-                        url: '/subcategory/api/by-category/' + categoryId,
-                        method: 'GET',
-                        success: function(data) {
-                            subcategorySelect.html('<option value="" disabled selected>Select Parent Subcategory</option>');
-                            if (data.length > 0) {
-                                data.forEach(function(sub) {
-                                    subcategorySelect.append('<option value="' + sub._id + '">' + sub.name + '</option>');
-                                });
-                            } else {
-                                subcategorySelect.html('<option value="" disabled selected>No subcategories found</option>');
-                            }
-                        },
-                        error: function() {
-                            subcategorySelect.html('<option value="" disabled selected>Error loading subcategories</option>');
-                        }
-                    });
-                }
-            });
+            // Using our backend route matching the pattern
+            fetch(`/subcategory/api/by-category/${category}`)
+                .then(res => res.json())
+                .then(data => {
+                    subCategoryId.innerHTML = '<option value="" disabled selected>Select Parent Subcategory</option>';
+                    data.forEach(subCat => {
+                        let option = document.createElement('option');
+                        option.innerHTML = subCat.name;
+                        option.setAttribute("value", subCat._id);
+                        subCategoryId.append(option);
+                    })
+                })
+                .catch(err => console.log(err));
         });
     </script>
 </body>

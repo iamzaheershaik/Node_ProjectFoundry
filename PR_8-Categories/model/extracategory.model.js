@@ -16,6 +16,15 @@ const extracategorySchema = mongoose.Schema({
   extracategoryImage: {
     type: String,
   },
+  price: {
+    type: Number,
+    required: true,
+  },
+  quantity: {
+    type: Number,
+    required: true,
+    default: 0,
+  },
   createdAt: {
     type: Date,
     default: Date.now,

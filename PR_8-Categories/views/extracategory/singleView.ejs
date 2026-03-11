@@ -36,7 +36,8 @@
                                 <nav aria-label="breadcrumb">
                                     <ol class="breadcrumb">
                                         <li class="breadcrumb-item"><a href="/dashboard">Dashboard</a></li>
-                                        <li class="breadcrumb-item"><a href="/extracategory/view">ExtraCategories</a></li>
+                                        <li class="breadcrumb-item"><a href="/extracategory/view">ExtraCategories</a>
+                                        </li>
                                         <li class="breadcrumb-item active" aria-current="page">View ExtraCategory</li>
                                     </ol>
                                 </nav>
@@ -100,13 +101,14 @@
                                                         <div class="col-md-4 text-center">
                                                             <% if (extracategory.extracategoryImage) { %>
                                                                 <img src="<%= extracategory.extracategoryImage %>"
-                                                                    alt="<%= extracategory.name %>" class="rounded img-fluid"
-                                                                    style="max-height: 250px; object-fit: cover; border: 3px solid #7460ee;">
-                                                            <% } else { %>
-                                                                <img src="/assets/images/big/img1.jpg" alt="Default"
+                                                                    alt="<%= extracategory.name %>"
                                                                     class="rounded img-fluid"
                                                                     style="max-height: 250px; object-fit: cover; border: 3px solid #7460ee;">
-                                                            <% } %>
+                                                                <% } else { %>
+                                                                    <img src="/assets/images/big/img1.jpg" alt="Default"
+                                                                        class="rounded img-fluid"
+                                                                        style="max-height: 250px; object-fit: cover; border: 3px solid #7460ee;">
+                                                                    <% } %>
                                                         </div>
 
                                                         <!-- ExtraCategory Info -->
@@ -117,41 +119,87 @@
                                                                         <th width="180"><i
                                                                                 class="fas fa-tag mr-2 text-primary"></i>Name
                                                                         </th>
-                                                                        <td><strong><%= extracategory.name %></strong></td>
+                                                                        <td><strong>
+                                                                                <%= extracategory.name %>
+                                                                            </strong></td>
                                                                     </tr>
                                                                     <tr>
                                                                         <th><i
-                                                                                class="fas fa-folder mr-2 text-info"></i>Parent Category
+                                                                                class="fas fa-folder mr-2 text-info"></i>Parent
+                                                                            Category
                                                                         </th>
                                                                         <td>
                                                                             <span class="badge badge-info badge-pill"
                                                                                 style="font-size: 14px;">
-                                                                                <%= extracategory.subcategory && extracategory.subcategory.category ? extracategory.subcategory.category.name : 'N/A' %>
+                                                                                <%= extracategory.subcategory &&
+                                                                                    extracategory.subcategory.category ?
+                                                                                    extracategory.subcategory.category.name
+                                                                                    : 'N/A' %>
                                                                             </span>
                                                                         </td>
                                                                     </tr>
                                                                     <tr>
                                                                         <th><i
-                                                                                class="fas fa-folder-open mr-2 text-primary"></i>Parent Subcategory
+                                                                                class="fas fa-folder-open mr-2 text-primary"></i>Parent
+                                                                            Subcategory
                                                                         </th>
                                                                         <td>
                                                                             <span class="badge badge-primary badge-pill"
                                                                                 style="font-size: 14px;">
-                                                                                <%= extracategory.subcategory ? extracategory.subcategory.name : 'N/A' %>
+                                                                                <%= extracategory.subcategory ?
+                                                                                    extracategory.subcategory.name
+                                                                                    : 'N/A' %>
                                                                             </span>
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <th><i
+                                                                                class="fas fa-rupee-sign mr-2 text-success"></i>Price
+                                                                        </th>
+                                                                        <td>
+                                                                            <span class="badge badge-success"
+                                                                                style="font-size: 14px;">
+                                                                                ₹<%= extracategory.price || 0 %>
+                                                                            </span>
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr>
+                                                                        <th><i
+                                                                                class="fas fa-boxes mr-2 text-info"></i>Quantity
+                                                                        </th>
+                                                                        <td>
+                                                                            <% if (extracategory.quantity> 0) { %>
+                                                                                <span class="badge badge-primary"
+                                                                                    style="font-size: 14px;">
+                                                                                    <%= extracategory.quantity %> in
+                                                                                        stock
+                                                                                </span>
+                                                                                <% } else { %>
+                                                                                    <span class="badge badge-danger"
+                                                                                        style="font-size: 14px;">
+                                                                                        Out of stock
+                                                                                    </span>
+                                                                                    <% } %>
                                                                         </td>
                                                                     </tr>
                                                                     <tr>
                                                                         <th><i
                                                                                 class="fas fa-align-left mr-2 text-primary"></i>Description
                                                                         </th>
-                                                                        <td><%= extracategory.description || 'No description provided' %></td>
+                                                                        <td>
+                                                                            <%= extracategory.description
+                                                                                || 'No description provided' %>
+                                                                        </td>
                                                                     </tr>
                                                                     <tr>
                                                                         <th><i
                                                                                 class="fas fa-calendar-alt mr-2 text-primary"></i>Created
                                                                             At</th>
-                                                                        <td><%= extracategory.createdAt ? new Date(extracategory.createdAt).toLocaleDateString() : 'N/A' %></td>
+                                                                        <td>
+                                                                            <%= extracategory.createdAt ? new
+                                                                                Date(extracategory.createdAt).toLocaleDateString()
+                                                                                : 'N/A' %>
+                                                                        </td>
                                                                     </tr>
                                                                 </tbody>
                                                             </table>
