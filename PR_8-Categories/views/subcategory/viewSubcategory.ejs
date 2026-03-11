@@ -108,6 +108,7 @@
                                                                     <th>Subcategory Name</th>
                                                                     <th>Parent Category</th>
                                                                     <th>Description</th>
+                                                                    <th>ExtraCategories</th>
                                                                     <th>Created At</th>
                                                                     <th>Actions</th>
                                                                 </tr>
@@ -141,6 +142,11 @@
                                                                                 <%= sub.description ? sub.description.substring(0, 50) + (sub.description.length > 50 ? '...' : '') : 'N/A' %>
                                                                             </td>
                                                                             <td>
+                                                                                <span class="badge badge-pill badge-primary" style="font-size: 13px;">
+                                                                                    <%= sub.extracategoryCount || 0 %>
+                                                                                </span>
+                                                                            </td>
+                                                                            <td>
                                                                                 <%= sub.createdAt ? new Date(sub.createdAt).toLocaleDateString() : 'N/A' %>
                                                                             </td>
                                                                             <td>
@@ -165,7 +171,7 @@
                                                                     <% }) %>
                                                                 <% } else { %>
                                                                     <tr>
-                                                                        <td colspan="7"
+                                                                        <td colspan="8"
                                                                             class="text-center text-muted py-4">
                                                                             <i class="mdi mdi-folder-remove-outline font-24 d-block mb-2"></i>
                                                                             <% if (typeof search !=='undefined' && search) { %>

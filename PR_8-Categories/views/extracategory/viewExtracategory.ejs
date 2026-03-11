@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Blog Admin Panel">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon.png">
+    <title>Blog Admin Panel</title>
+    <link href="/assets/libs/toastr/build/toastr.min.css" rel="stylesheet">
+    <link href="/dist/css/style.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="preloader">
+        <div class="lds-ripple">
+            <div class="lds-pos"></div>
+            <div class="lds-pos"></div>
+        </div>
+    </div>
+    <div id="main-wrapper" data-layout="vertical" data-navbarbg="skin5" data-sidebartype="full"
+        data-sidebar-position="absolute" data-header-position="absolute" data-boxed-layout="full">
+        <%- include('../header') %>
+            <div class="page-wrapper">
+                <!-- ============================================================== -->
+                <!-- View All ExtraCategories Page (Card Layout) -->
+                <!-- ============================================================== -->
+
+                <!-- Bread crumb -->
+                <div class="page-breadcrumb">
+                    <div class="row">
+                        <div class="col-5 align-self-center">
+                            <h4 class="page-title">View ExtraCategories</h4>
+                            <div class="d-flex align-items-center">
+                                <nav aria-label="breadcrumb">
+                                    <ol class="breadcrumb">
+                                        <li class="breadcrumb-item"><a href="/dashboard">Dashboard</a></li>
+                                        <li class="breadcrumb-item active" aria-current="page">View ExtraCategories</li>
+                                    </ol>
+                                </nav>
+                            </div>
+                        </div>
+                        <div class="col-7 align-self-center text-right">
+                            <a href="/extracategory/add" class="btn btn-primary">
+                                <i class="fas fa-plus-circle mr-1"></i> Add New ExtraCategory
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <!-- End Breadcrumb -->
+
+                <!-- Container fluid -->
+                <div class="container-fluid">
+
+                    <!-- Flash Messages -->
+                    <% if (typeof success !=='undefined' && success) { %>
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <%= success %>
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                        </div>
+                        <% } %>
+                            <% if (typeof error !=='undefined' && error) { %>
+                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                    <%= error %>
+                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                </div>
+                                <% } %>
+
+                                    <!-- Search Bar -->
+                                    <div class="row mb-3">
+                                        <div class="col-12">
+                                            <div class="card">
+                                                <div class="card-body py-3">
+                                                    <form method="GET" action="/extracategory/view">
+                                                        <div class="input-group">
+                                                            <input type="text" name="search" class="form-control"
+                                                                placeholder="Search by name or description..."
+                                                                value="<%= typeof search !== 'undefined' ? search : '' %>">
+                                                            <div class="input-group-append">
+                                                                <button type="submit" class="btn btn-primary"><i
+                                                                        class="fas fa-search mr-1"></i>Search</button>
+                                                                <% if (typeof search !=='undefined' && search) { %>
+                                                                    <a href="/extracategory/view"
+                                                                        class="btn btn-secondary"><i
+                                                                            class="fas fa-times mr-1"></i>Clear</a>
+                                                                    <% } %>
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- End Search Bar -->
+
+                                    <!-- Card Layout for ExtraCategories -->
+                                    <div class="row">
+                                        <% if (typeof extracategories !=='undefined' && extracategories.length > 0) { %>
+                                            <% extracategories.forEach(function(extra) { %>
+                                                <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
+                                                    <div class="card h-100" style="border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: transform 0.2s, box-shadow 0.2s;">
+                                                        <!-- Card Image -->
+                                                        <div style="height: 180px; overflow: hidden; background: #f6f7fb;">
+                                                            <% if (extra.extracategoryImage) { %>
+                                                                <img src="<%= extra.extracategoryImage %>"
+                                                                    alt="<%= extra.name %>"
+                                                                    style="width: 100%; height: 100%; object-fit: cover;">
+                                                            <% } else { %>
+                                                                <img src="/assets/images/big/img1.jpg"
+                                                                    alt="Default"
+                                                                    style="width: 100%; height: 100%; object-fit: cover;">
+                                                            <% } %>
+                                                        </div>
+
+                                                        <!-- Card Body -->
+                                                        <div class="card-body">
+                                                            <h5 class="card-title font-weight-bold mb-2">
+                                                                <i class="mdi mdi-folder-multiple-outline mr-1 text-primary"></i>
+                                                                <%= extra.name %>
+                                                            </h5>
+
+                                                            <!-- Parent Badges -->
+                                                            <div class="mb-2">
+                                                                <% if (extra.subcategory && extra.subcategory.category) { %>
+                                                                    <span class="badge badge-info mr-1" style="font-size: 11px;">
+                                                                        <i class="mdi mdi-folder mr-1"></i><%= extra.subcategory.category.name %>
+                                                                    </span>
+                                                                <% } %>
+                                                                <% if (extra.subcategory) { %>
+                                                                    <span class="badge badge-primary" style="font-size: 11px;">
+                                                                        <i class="mdi mdi-folder-star mr-1"></i><%= extra.subcategory.name %>
+                                                                    </span>
+                                                                <% } %>
+                                                            </div>
+
+                                                            <p class="card-text text-muted" style="font-size: 13px;">
+                                                                <%= extra.description ? extra.description.substring(0, 80) + (extra.description.length > 80 ? '...' : '') : 'No description provided' %>
+                                                            </p>
+
+                                                            <small class="text-muted">
+                                                                <i class="fas fa-calendar-alt mr-1"></i>
+                                                                <%= extra.createdAt ? new Date(extra.createdAt).toLocaleDateString() : 'N/A' %>
+                                                            </small>
+                                                        </div>
+
+                                                        <!-- Card Footer with Actions -->
+                                                        <div class="card-footer bg-white border-top" style="padding: 12px 20px;">
+                                                            <div class="d-flex justify-content-between">
+                                                                <a href="/extracategory/view/<%= extra._id %>"
+                                                                    class="btn btn-sm btn-info" title="View">
+                                                                    <i class="fas fa-eye mr-1"></i> View
+                                                                </a>
+                                                                <a href="/extracategory/edit/<%= extra._id %>"
+                                                                    class="btn btn-sm btn-warning" title="Edit">
+                                                                    <i class="fas fa-edit mr-1"></i> Edit
+                                                                </a>
+                                                                <a href="/extracategory/delete/<%= extra._id %>"
+                                                                    class="btn btn-sm btn-danger" title="Delete"
+                                                                    onclick="return confirm('Are you sure you want to delete this extra category?')">
+                                                                    <i class="fas fa-trash-alt mr-1"></i> Delete
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            <% }) %>
+                                        <% } else { %>
+                                            <div class="col-12">
+                                                <div class="card">
+                                                    <div class="card-body text-center text-muted py-5">
+                                                        <i class="mdi mdi-folder-remove-outline font-24 d-block mb-2"></i>
+                                                        <% if (typeof search !=='undefined' && search) { %>
+                                                            No extra categories found matching
+                                                            "<strong><%= search %></strong>".
+                                                            <a href="/extracategory/view">View all extra categories</a>.
+                                                        <% } else { %>
+                                                            No extra categories found.
+                                                            <a href="/extracategory/add">Create one now</a>.
+                                                        <% } %>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        <% } %>
+                                    </div>
+                                    <!-- End Card Layout -->
+
+                </div>
+                <!-- End Container fluid -->
+                <%- include('../footer') %>
+            </div>
+    </div>
+    <script src="/assets/libs/jquery/dist/jquery.min.js"></script>
+    <script src="/assets/libs/popper.js/dist/umd/popper.min.js"></script>
+    <script src="/assets/libs/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="/dist/js/app-style-switcher.js"></script>
+    <script src="/dist/js/waves.js"></script>
+    <script src="/dist/js/sidebarmenu.js"></script>
+    <script src="/dist/js/custom.js"></script>
+    <script src="/assets/libs/toastr/build/toastr.min.js"></script>
+
+    <!-- Card hover effect -->
+    <style>
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+        }
+    </style>
+</body>
+
+</html>
