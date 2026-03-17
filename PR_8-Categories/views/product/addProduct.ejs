@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Blog Admin Panel">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon.png">
+    <title>Blog Admin Panel</title>
+    <link href="/assets/libs/toastr/build/toastr.min.css" rel="stylesheet">
+    <link href="/dist/css/style.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="preloader">
+        <div class="lds-ripple">
+            <div class="lds-pos"></div>
+            <div class="lds-pos"></div>
+        </div>
+    </div>
+    <div id="main-wrapper" data-layout="vertical" data-navbarbg="skin5" data-sidebartype="full"
+        data-sidebar-position="absolute" data-header-position="absolute" data-boxed-layout="full">
+        <%- include('../header') %>
+            <div class="page-wrapper">
+
+                <!-- Bread crumb -->
+                <div class="page-breadcrumb">
+                    <div class="row">
+                        <div class="col-5 align-self-center">
+                            <h4 class="page-title">Add Product</h4>
+                            <div class="d-flex align-items-center">
+                                <nav aria-label="breadcrumb">
+                                    <ol class="breadcrumb">
+                                        <li class="breadcrumb-item"><a href="/dashboard">Dashboard</a></li>
+                                        <li class="breadcrumb-item"><a href="/product/view">Products</a></li>
+                                        <li class="breadcrumb-item active" aria-current="page">Add Product</li>
+                                    </ol>
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- End Breadcrumb -->
+
+                <!-- Container fluid -->
+                <div class="container-fluid">
+
+                    <!-- Flash Messages -->
+                    <% if (typeof success !=='undefined' && success) { %>
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <%= success %>
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                        </div>
+                        <% } %>
+                            <% if (typeof error !=='undefined' && error) { %>
+                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                    <%= error %>
+                                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                </div>
+                                <% } %>
+
+                                    <!-- Row -->
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <div class="card">
+                                                <div class="card-body">
+                                                    <h4 class="card-title">Add New Product</h4>
+                                                    <h6 class="card-subtitle mb-3 text-muted">Fill in the details below
+                                                        to create a new product.</h6>
+                                                    <hr>
+
+                                                    <form action="/product/add" method="POST"
+                                                        enctype="multipart/form-data" class="mt-4">
+
+                                                        <div class="row">
+                                                            <!-- Category (cascading) -->
+                                                            <div class="col-md-4">
+                                                                <div class="form-group">
+                                                                    <label for="productCategory">Category <span
+                                                                            class="text-danger">*</span></label>
+                                                                    <div class="input-group">
+                                                                        <div class="input-group-prepend">
+                                                                            <span class="input-group-text"><i
+                                                                                    class="fas fa-folder"></i></span>
+                                                                        </div>
+                                                                        <select class="form-control" id="productCategory"
+                                                                            name="category" required>
+                                                                            <option value="" disabled selected>Select
+                                                                                Category</option>
+                                                                            <% if (typeof categories !=='undefined' &&
+                                                                                categories.length> 0) { %>
+                                                                                <% categories.forEach(function(cat) { %>
+                                                                                    <option value="<%= cat._id %>">
+                                                                                        <%= cat.name %>
+                                                                                    </option>
+                                                                                    <% }) %>
+                                                                                        <% } %>
+                                                                        </select>
+                                                                    </div>
+                                                                    <small class="form-text text-muted">Select a
+                                                                        category first to load subcategories.</small>
+                                                                </div>
+                                                            </div>
+
+                                                            <!-- Subcategory (cascading) -->
+                                                            <div class="col-md-4">
+                                                                <div class="form-group">
+                                                                    <label for="productSubcategory">Subcategory
+                                                                        <span class="text-danger">*</span></label>
+                                                                    <div class="input-group">
+                                                                        <div class="input-group-prepend">
+                                                                            <span class="input-group-text"><i
+                                                                                    class="fas fa-folder-open"></i></span>
+                                                                        </div>
+                                                                        <select class="form-control"
+                                                                            id="productSubcategory" name="subcategory"
+                                                                            required>
+                                                                            <option value="" disabled selected>Select
+                                                                                Category First</option>
+                                                                        </select>
+                                                                    </div>
+                                                                    <small class="form-text text-muted">Subcategories
+                                                                        load based on selected category.</small>
+                                                                </div>
+                                                            </div>
+
+                                                            <!-- ExtraCategory (cascading) -->
+                                                            <div class="col-md-4">
+                                                                <div class="form-group">
+                                                                    <label for="productExtracategory">ExtraCategory
+                                                                        <span class="text-danger">*</span></label>
+                                                                    <div class="input-group">
+                                                                        <div class="input-group-prepend">
+                                                                            <span class="input-group-text"><i
+                                                                                    class="fas fa-folder-minus"></i></span>
+                                                                        </div>
+                                                                        <select class="form-control"
+                                                                            id="productExtracategory"
+                                                                            name="extracategory" required>
+                                                                            <option value="" disabled selected>Select
+                                                                                Subcategory First</option>
+                                                                        </select>
+                                                                    </div>
+                                                                    <small class="form-text text-muted">ExtraCategories
+                                                                        load based on selected subcategory.</small>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="row">
+                                                            <!-- Product Name -->
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label for="productName">Product Name
+                                                                        <span class="text-danger">*</span></label>
+                                                                    <div class="input-group">
+                                                                        <div class="input-group-prepend">
+                                                                            <span class="input-group-text"><i
+                                                                                    class="fas fa-box"></i></span>
+                                                                        </div>
+                                                                        <input type="text" class="form-control"
+                                                                            id="productName" name="name"
+                                                                            placeholder="Enter product name"
+                                                                            required>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <!-- Product Image -->
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label for="productImage">Product
+                                                                        Image</label>
+                                                                    <div class="custom-file">
+                                                                        <input type="file" class="custom-file-input"
+                                                                            id="productImage"
+                                                                            name="productImage" accept="image/*">
+                                                                        <label class="custom-file-label"
+                                                                            for="productImage">Choose
+                                                                            file...</label>
+                                                                    </div>
+                                                                    <small class="form-text text-muted">Product
+                                                                        image. Max: 2MB.</small>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="row">
+                                                            <!-- Price -->
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label for="productPrice">Price <span
+                                                                            class="text-danger">*</span></label>
+                                                                    <div class="input-group">
+                                                                        <div class="input-group-prepend">
+                                                                            <span class="input-group-text"><i
+                                                                                    class="fas fa-rupee-sign"></i></span>
+                                                                        </div>
+                                                                        <input type="number" class="form-control"
+                                                                            id="productPrice" name="price"
+                                                                            placeholder="Enter price" min="0" required>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <!-- Quantity -->
+                                                            <div class="col-md-6">
+                                                                <div class="form-group">
+                                                                    <label for="productQuantity">Quantity <span
+                                                                            class="text-danger">*</span></label>
+                                                                    <div class="input-group">
+                                                                        <div class="input-group-prepend">
+                                                                            <span class="input-group-text"><i
+                                                                                    class="fas fa-boxes"></i></span>
+                                                                        </div>
+                                                                        <input type="number" class="form-control"
+                                                                            id="productQuantity" name="quantity"
+                                                                            placeholder="Enter quantity" min="0"
+                                                                            required>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="row">
+                                                            <!-- Description -->
+                                                            <div class="col-md-12">
+                                                                <div class="form-group">
+                                                                    <label
+                                                                        for="productDescription">Description</label>
+                                                                    <textarea class="form-control"
+                                                                        id="productDescription" name="description"
+                                                                        rows="4"
+                                                                        placeholder="Write product description here..."></textarea>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <hr>
+
+                                                        <!-- Submit Buttons -->
+                                                        <div class="form-group mb-0">
+                                                            <button type="submit" class="btn btn-primary mr-2">
+                                                                <i class="fas fa-plus-circle mr-1"></i> Add
+                                                                Product
+                                                            </button>
+                                                            <a href="/product/view" class="btn btn-secondary">
+                                                                <i class="fas fa-arrow-left mr-1"></i> Cancel
+                                                            </a>
+                                                        </div>
+
+                                                    </form>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- End Row -->
+
+                </div>
+                <!-- End Container fluid -->
+
+                <!-- Custom file input label update script -->
+                <script>
+                    document.querySelectorAll('.custom-file-input').forEach(function (input) {
+                        input.addEventListener('change', function (e) {
+                            var fileName = e.target.files[0] ? e.target.files[0].name : 'Choose file...';
+                            var label = e.target.nextElementSibling;
+                            label.textContent = fileName;
+                        });
+                    });
+                </script>
+                <%- include('../footer') %>
+            </div>
+    </div>
+    <script src="/assets/libs/jquery/dist/jquery.min.js"></script>
+    <script src="/assets/libs/popper.js/dist/umd/popper.min.js"></script>
+    <script src="/assets/libs/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="/dist/js/app-style-switcher.js"></script>
+    <script src="/dist/js/waves.js"></script>
+    <script src="/dist/js/sidebarmenu.js"></script>
+    <script src="/dist/js/custom.js"></script>
+    <script src="/assets/libs/toastr/build/toastr.min.js"></script>
+
+    <!-- Cascading Dropdown Script: Category → Subcategory → ExtraCategory -->
+    <script>
+        let categorySelect = document.querySelector('#productCategory');
+        let subcategorySelect = document.querySelector('#productSubcategory');
+        let extracategorySelect = document.querySelector('#productExtracategory');
+
+        // Category → Subcategory
+        categorySelect.addEventListener('change', () => {
+            let categoryId = categorySelect.value;
+
+            // Reset subcategory and extracategory
+            subcategorySelect.innerHTML = '<option value="" disabled selected>Select Subcategory</option>';
+            extracategorySelect.innerHTML = '<option value="" disabled selected>Select Subcategory First</option>';
+
+            fetch(`/subcategory/api/by-category/${categoryId}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.length > 0) {
+                        data.forEach(subCat => {
+                            let option = document.createElement('option');
+                            option.innerHTML = subCat.name;
+                            option.setAttribute("value", subCat._id);
+                            subcategorySelect.append(option);
+                        });
+                    } else {
+                        subcategorySelect.innerHTML = '<option value="" disabled selected>No subcategories available</option>';
+                    }
+                })
+                .catch(err => console.log(err));
+        });
+
+        // Subcategory → ExtraCategory
+        subcategorySelect.addEventListener('change', () => {
+            let subcategoryId = subcategorySelect.value;
+
+            // Reset extracategory
+            extracategorySelect.innerHTML = '<option value="" disabled selected>Select ExtraCategory</option>';
+
+            fetch(`/extracategory/api/by-subcategory/${subcategoryId}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.length > 0) {
+                        data.forEach(extraCat => {
+                            let option = document.createElement('option');
+                            option.innerHTML = extraCat.name;
+                            option.setAttribute("value", extraCat._id);
+                            extracategorySelect.append(option);
+                        });
+                    } else {
+                        extracategorySelect.innerHTML = '<option value="" disabled selected>No extra categories available</option>';
+                    }
+                })
+                .catch(err => console.log(err));
+        });
+    </script>
+</body>
+
+</html>

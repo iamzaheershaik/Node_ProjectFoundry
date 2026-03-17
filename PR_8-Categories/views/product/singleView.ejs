@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Blog Admin Panel">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon.png">
+    <title>Blog Admin Panel</title>
+    <link href="/assets/libs/toastr/build/toastr.min.css" rel="stylesheet">
+    <link href="/dist/css/style.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="preloader">
+        <div class="lds-ripple">
+            <div class="lds-pos"></div>
+            <div class="lds-pos"></div>
+        </div>
+    </div>
+    <div id="main-wrapper" data-layout="vertical" data-navbarbg="skin5" data-sidebartype="full"
+        data-sidebar-position="absolute" data-header-position="absolute" data-boxed-layout="full">
+        <%- include('../header') %>
+            <div class="page-wrapper">
+
+                <!-- Bread crumb -->
+                <div class="page-breadcrumb">
+                    <div class="row">
+                        <div class="col-5 align-self-center">
+                            <h4 class="page-title">Product Details</h4>
+                            <div class="d-flex align-items-center">
+                                <nav aria-label="breadcrumb">
+                                    <ol class="breadcrumb">
+                                        <li class="breadcrumb-item"><a href="/dashboard">Dashboard</a></li>
+                                        <li class="breadcrumb-item"><a href="/product/view">Products</a></li>
+                                        <li class="breadcrumb-item active" aria-current="page"><%= product.name %></li>
+                                    </ol>
+                                </nav>
+                            </div>
+                        </div>
+                        <div class="col-7 align-self-center text-right">
+                        </div>
+                    </div>
+                </div>
+                <!-- End Breadcrumb -->
+
+                <!-- Container fluid -->
+                <div class="container-fluid">
+
+                    <!-- Flash Messages -->
+                    <% if (typeof success !=='undefined' && success) { %>
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <%= success %>
+                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                        </div>
+                        <% } %>
+
+                            <div class="row">
+                                <div class="col-lg-8 col-md-12">
+                                    <div class="card"
+                                        style="border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+
+                                        <!-- Product Image -->
+                                        <div style="height: 350px; overflow: hidden; background: #f6f7fb; display: flex; align-items: center; justify-content: center;">
+                                            <% if (product.productImage) { %>
+                                                <img src="<%= product.productImage %>" alt="<%= product.name %>"
+                                                    style="width: 100%; height: 100%; object-fit: contain; padding: 15px;">
+                                                <% } else { %>
+                                                    <div style="text-align: center; color: #b0bec5;">
+                                                        <i class="mdi mdi-image-off" style="font-size: 72px;"></i>
+                                                        <p style="margin: 8px 0 0; font-size: 14px;">No Image Available</p>
+                                                    </div>
+                                                    <% } %>
+                                        </div>
+
+                                        <div class="card-body">
+                                            <h3 class="card-title font-weight-bold">
+                                                <i class="mdi mdi-package-variant mr-2 text-primary"></i>
+                                                <%= product.name %>
+                                            </h3>
+
+                                            <!-- Category Chain -->
+                                            <div class="mb-3">
+                                                <% if (product.category) { %>
+                                                    <span class="badge badge-info mr-1" style="font-size: 12px;">
+                                                        <i class="mdi mdi-folder mr-1"></i>
+                                                        <%= product.category.name %>
+                                                    </span>
+                                                    <% } %>
+                                                <% if (product.subcategory) { %>
+                                                    <span class="badge badge-primary mr-1" style="font-size: 12px;">
+                                                        <i class="mdi mdi-folder-star mr-1"></i>
+                                                        <%= product.subcategory.name %>
+                                                    </span>
+                                                    <% } %>
+                                                <% if (product.extracategory) { %>
+                                                    <span class="badge badge-secondary" style="font-size: 12px;">
+                                                        <i class="mdi mdi-folder-multiple-outline mr-1"></i>
+                                                        <%= product.extracategory.name %>
+                                                    </span>
+                                                    <% } %>
+                                            </div>
+
+                                            <hr>
+
+                                            <!-- Price & Stock -->
+                                            <div class="row mb-3">
+                                                <div class="col-md-6">
+                                                    <h5 class="text-muted mb-1">Price</h5>
+                                                    <h3 class="text-success font-weight-bold">
+                                                        ₹<%= product.price || 0 %>
+                                                    </h3>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <h5 class="text-muted mb-1">Stock Status</h5>
+                                                    <% if (product.quantity > 0) { %>
+                                                        <span class="badge badge-success" style="font-size: 14px;">
+                                                            <i class="fas fa-check-circle mr-1"></i> In Stock:
+                                                            <%= product.quantity %> units
+                                                        </span>
+                                                        <% } else { %>
+                                                            <span class="badge badge-danger" style="font-size: 14px;">
+                                                                <i class="fas fa-times-circle mr-1"></i> Out of Stock
+                                                            </span>
+                                                            <% } %>
+                                                </div>
+                                            </div>
+
+                                            <!-- Description -->
+                                            <h5 class="text-muted mb-1">Description</h5>
+                                            <p class="card-text" style="font-size: 14px; line-height: 1.7;">
+                                                <%= product.description || 'No description provided.' %>
+                                            </p>
+
+                                            <hr>
+
+                                            <!-- Meta Info -->
+                                            <div class="d-flex justify-content-between text-muted"
+                                                style="font-size: 13px;">
+                                                <span>
+                                                    <i class="fas fa-calendar-alt mr-1"></i>
+                                                    Created: <%= product.createdAt ? new
+                                                        Date(product.createdAt).toLocaleDateString('en-IN', {
+                                                        year: 'numeric',
+                                                        month: 'long',
+                                                        day: 'numeric'
+                                                        }) : 'N/A' %>
+                                                </span>
+                                                <span>
+                                                    <i class="fas fa-fingerprint mr-1"></i>
+                                                    ID: <%= product._id %>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Quick Actions Sidebar -->
+                                <div class="col-lg-4 col-md-12">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h5 class="card-title">Quick Actions</h5>
+                                            <hr>
+                                            <a href="/product/edit/<%= product._id %>"
+                                                class="btn btn-warning btn-block mb-2">
+                                                <i class="fas fa-edit mr-1"></i> Edit Product
+                                            </a>
+                                            <a href="/product/delete/<%= product._id %>"
+                                                class="btn btn-danger btn-block mb-2"
+                                                onclick="return confirm('Are you sure?')">
+                                                <i class="fas fa-trash-alt mr-1"></i> Delete Product
+                                            </a>
+                                            <a href="/product/view" class="btn btn-secondary btn-block">
+                                                <i class="fas fa-arrow-left mr-1"></i> Back to Products
+                                            </a>
+                                        </div>
+                                    </div>
+
+                                    <!-- Category Path Card -->
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h5 class="card-title">Category Path</h5>
+                                            <hr>
+                                            <ul class="list-unstyled" style="font-size: 14px;">
+                                                <% if (product.category) { %>
+                                                    <li class="mb-2">
+                                                        <i class="mdi mdi-folder text-info mr-1"></i>
+                                                        <strong>Category:</strong>
+                                                        <a href="/category/view/<%= product.category._id %>">
+                                                            <%= product.category.name %>
+                                                        </a>
+                                                    </li>
+                                                    <% } %>
+                                                <% if (product.subcategory) { %>
+                                                    <li class="mb-2">
+                                                        <i class="mdi mdi-folder-star text-primary mr-1"></i>
+                                                        <strong>Subcategory:</strong>
+                                                        <a href="/subcategory/view/<%= product.subcategory._id %>">
+                                                            <%= product.subcategory.name %>
+                                                        </a>
+                                                    </li>
+                                                    <% } %>
+                                                <% if (product.extracategory) { %>
+                                                    <li class="mb-2">
+                                                        <i class="mdi mdi-folder-multiple-outline text-secondary mr-1"></i>
+                                                        <strong>ExtraCategory:</strong>
+                                                        <a href="/extracategory/view/<%= product.extracategory._id %>">
+                                                            <%= product.extracategory.name %>
+                                                        </a>
+                                                    </li>
+                                                    <% } %>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                </div>
+                <!-- End Container fluid -->
+                <%- include('../footer') %>
+            </div>
+    </div>
+    <script src="/assets/libs/jquery/dist/jquery.min.js"></script>
+    <script src="/assets/libs/popper.js/dist/umd/popper.min.js"></script>
+    <script src="/assets/libs/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="/dist/js/app-style-switcher.js"></script>
+    <script src="/dist/js/waves.js"></script>
+    <script src="/dist/js/sidebarmenu.js"></script>
+    <script src="/dist/js/custom.js"></script>
+    <script src="/assets/libs/toastr/build/toastr.min.js"></script>
+</body>
+
+</html>
