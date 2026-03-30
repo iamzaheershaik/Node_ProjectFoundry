@@ -1,6 +1,7 @@
 const Admin = require("../models/Admin");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const sendCredentialsMail = require("../utils/sendCredentialsMail");
 
 // create admin (superadmin creates admin)
 const createAdmin = async (req, res) => {
@@ -9,7 +10,7 @@ const createAdmin = async (req, res) => {
 
     const adminExists = await Admin.findOne({ email });
     if (adminExists) {
-      return res.status(400).json({ message: "Admin already exists" });
+      return res.json({ message: "Admin already exists" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -19,7 +20,6 @@ const createAdmin = async (req, res) => {
       lastName,
       email,
       password: hashedPassword,
-      profileImage: req.file ? req.file.path : "",
       phoneNo,
       gender,
       position,
@@ -28,9 +28,22 @@ const createAdmin = async (req, res) => {
       createdBy: req.user.id,
     });
 
-    res.status(201).json({ message: "Admin created successfully", admin });
+    // Send login credentials email to the new admin
+    const emailResult = await sendCredentialsMail(
+      email,
+      `${firstName} ${lastName}`,
+      password,
+      "admin",
+      "superadmin"
+    );
+
+    res.json({
+      message: "Admin created successfully",
+      admin,
+      emailSent: emailResult.success,
+    });
   } catch (error) {
-    res.status(500).json({ message: "Something went wrong", error: error.message });
+    res.json({ message: "Something went wrong", error: error.message });
   }
 };
 
@@ -41,12 +54,12 @@ const loginAdmin = async (req, res) => {
 
     const admin = await Admin.findOne({ email });
     if (!admin) {
-      return res.status(404).json({ message: "Admin not found" });
+      return res.json({ message: "Admin not found" });
     }
 
     const isMatch = await bcrypt.compare(password, admin.password);
     if (!isMatch) {
-      return res.status(400).json({ message: "Invalid password" });
+      return res.json({ message: "Invalid password" });
     }
 
     const token = jwt.sign(
@@ -55,9 +68,9 @@ const loginAdmin = async (req, res) => {
       { expiresIn: "1d" }
     );
 
-    res.status(200).json({ message: "Login successful", token });
+    res.json({ message: "Login successful", token });
   } catch (error) {
-    res.status(500).json({ message: "Something went wrong", error: error.message });
+    res.json({ message: "Something went wrong", error: error.message });
   }
 };
 
@@ -66,11 +79,11 @@ const getAdmin = async (req, res) => {
   try {
     const admin = await Admin.findById(req.user.id).select("-password");
     if (!admin) {
-      return res.status(404).json({ message: "Admin not found" });
+      return res.json({ message: "Admin not found" });
     }
-    res.status(200).json(admin);
+    res.json(admin);
   } catch (error) {
-    res.status(500).json({ message: "Something went wrong", error: error.message });
+    res.json({ message: "Something went wrong", error: error.message });
   }
 };
 
@@ -78,9 +91,9 @@ const getAdmin = async (req, res) => {
 const viewAdmins = async (req, res) => {
   try {
     const admins = await Admin.find().select("-password");
-    res.status(200).json(admins);
+    res.json(admins);
   } catch (error) {
-    res.status(500).json({ message: "Something went wrong", error: error.message });
+    res.json({ message: "Something went wrong", error: error.message });
   }
 };
 
@@ -89,11 +102,11 @@ const singleviewAdmin = async (req, res) => {
   try {
     const admin = await Admin.findById(req.params.id).select("-password");
     if (!admin) {
-      return res.status(404).json({ message: "Admin not found" });
+      return res.json({ message: "Admin not found" });
     }
-    res.status(200).json(admin);
+    res.json(admin);
   } catch (error) {
-    res.status(500).json({ message: "Something went wrong", error: error.message });
+    res.json({ message: "Something went wrong", error: error.message });
   }
 };
 
@@ -111,9 +124,9 @@ const updateAdmin = async (req, res) => {
     }
 
     const admin = await Admin.findByIdAndUpdate(req.user.id, updatedData, { new: true }).select("-password");
-    res.status(200).json({ message: "Admin updated successfully", admin });
+    res.json({ message: "Admin updated successfully", admin });
   } catch (error) {
-    res.status(500).json({ message: "Something went wrong", error: error.message });
+    res.json({ message: "Something went wrong", error: error.message });
   }
 };
 
@@ -121,9 +134,9 @@ const updateAdmin = async (req, res) => {
 const deleteAdmin = async (req, res) => {
   try {
     await Admin.findByIdAndDelete(req.params.id);
-    res.status(200).json({ message: "Admin deleted successfully" });
+    res.json({ message: "Admin deleted successfully" });
   } catch (error) {
-    res.status(500).json({ message: "Something went wrong", error: error.message });
+    res.json({ message: "Something went wrong", error: error.message });
   }
 };
 

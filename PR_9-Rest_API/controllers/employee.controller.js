@@ -1,6 +1,7 @@
 const Employee = require("../models/Employee");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const sendCredentialsMail = require("../utils/sendCredentialsMail");
 
 // create employee (manager creates employee)
 const createEmployee = async (req, res) => {
@@ -10,7 +11,7 @@ const createEmployee = async (req, res) => {
     // check if employee already exists
     const employeeExists = await Employee.findOne({ email });
     if (employeeExists) {
-      return res.status(400).json({ message: "Employee already exists" });
+      return res.json({ message: "Employee already exists" });
     }
 
     // hash password
@@ -22,7 +23,6 @@ const createEmployee = async (req, res) => {
       lastName,
       email,
       password: hashedPassword,
-      profileImage: req.file ? req.file.path : "",
       phoneNo,
       gender,
       position,
@@ -31,9 +31,22 @@ const createEmployee = async (req, res) => {
       createdBy: req.user.id,
     });
 
-    res.status(201).json({ message: "Employee created successfully", employee });
+    // Send login credentials email to the new employee
+    const emailResult = await sendCredentialsMail(
+      email,
+      `${firstName} ${lastName}`,
+      password,
+      "employee",
+      "manager"
+    );
+
+    res.json({
+      message: "Employee created successfully",
+      employee,
+      emailSent: emailResult.success,
+    });
   } catch (error) {
-    res.status(500).json({ message: "Something went wrong", error: error.message });
+    res.json({ message: "Something went wrong", error: error.message });
   }
 };
 
@@ -45,13 +58,13 @@ const loginEmployee = async (req, res) => {
     // find employee
     const employee = await Employee.findOne({ email });
     if (!employee) {
-      return res.status(404).json({ message: "Employee not found" });
+      return res.json({ message: "Employee not found" });
     }
 
     // compare password
     const isMatch = await bcrypt.compare(password, employee.password);
     if (!isMatch) {
-      return res.status(400).json({ message: "Invalid password" });
+      return res.json({ message: "Invalid password" });
     }
 
     // create token
@@ -61,9 +74,9 @@ const loginEmployee = async (req, res) => {
       { expiresIn: "1d" }
     );
 
-    res.status(200).json({ message: "Login successful", token });
+    res.json({ message: "Login successful", token });
   } catch (error) {
-    res.status(500).json({ message: "Something went wrong", error: error.message });
+    res.json({ message: "Something went wrong", error: error.message });
   }
 };
 
@@ -71,9 +84,9 @@ const loginEmployee = async (req, res) => {
 const viewEmployees = async (req, res) => {
   try {
     const employees = await Employee.find().select("-password");
-    res.status(200).json(employees);
+    res.json(employees);
   } catch (error) {
-    res.status(500).json({ message: "Something went wrong", error: error.message });
+    res.json({ message: "Something went wrong", error: error.message });
   }
 };
 
@@ -82,11 +95,11 @@ const singleviewEmployee = async (req, res) => {
   try {
     const employee = await Employee.findById(req.params.id).select("-password");
     if (!employee) {
-      return res.status(404).json({ message: "Employee not found" });
+      return res.json({ message: "Employee not found" });
     }
-    res.status(200).json(employee);
+    res.json(employee);
   } catch (error) {
-    res.status(500).json({ message: "Something went wrong", error: error.message });
+    res.json({ message: "Something went wrong", error: error.message });
   }
 };
 
@@ -95,11 +108,11 @@ const getEmployee = async (req, res) => {
   try {
     const employee = await Employee.findById(req.user.id).select("-password");
     if (!employee) {
-      return res.status(404).json({ message: "Employee not found" });
+      return res.json({ message: "Employee not found" });
     }
-    res.status(200).json(employee);
+    res.json(employee);
   } catch (error) {
-    res.status(500).json({ message: "Something went wrong", error: error.message });
+    res.json({ message: "Something went wrong", error: error.message });
   }
 };
 
@@ -117,9 +130,9 @@ const updateEmployee = async (req, res) => {
     }
 
     const employee = await Employee.findByIdAndUpdate(req.user.id, updatedData, { new: true }).select("-password");
-    res.status(200).json({ message: "Employee updated successfully", employee });
+    res.json({ message: "Employee updated successfully", employee });
   } catch (error) {
-    res.status(500).json({ message: "Something went wrong", error: error.message });
+    res.json({ message: "Something went wrong", error: error.message });
   }
 };
 
@@ -127,9 +140,9 @@ const updateEmployee = async (req, res) => {
 const deleteEmployee = async (req, res) => {
   try {
     await Employee.findByIdAndDelete(req.params.id);
-    res.status(200).json({ message: "Employee deleted successfully" });
+    res.json({ message: "Employee deleted successfully" });
   } catch (error) {
-    res.status(500).json({ message: "Something went wrong", error: error.message });
+    res.json({ message: "Something went wrong", error: error.message });
   }
 };
 

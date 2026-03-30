@@ -9,7 +9,7 @@ const registerSuperAdmin = async (req, res) => {
 
     const superAdminExists = await SuperAdmin.findOne({ email });
     if (superAdminExists) {
-      return res.status(400).json({ message: "SuperAdmin already exists" });
+      return res.json({ message: "SuperAdmin already exists" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -19,14 +19,13 @@ const registerSuperAdmin = async (req, res) => {
       lastName,
       email,
       password: hashedPassword,
-      profileImage: req.file ? req.file.path : "",
       phoneNo,
       gender,
     });
 
-    res.status(201).json({ message: "SuperAdmin registered successfully", superAdmin });
+    res.json({ message: "SuperAdmin registered successfully", superAdmin });
   } catch (error) {
-    res.status(500).json({ message: "Something went wrong", error: error.message });
+    res.json({ message: "Something went wrong", error: error.message });
   }
 };
 
@@ -37,12 +36,12 @@ const loginSuperAdmin = async (req, res) => {
 
     const superAdmin = await SuperAdmin.findOne({ email });
     if (!superAdmin) {
-      return res.status(404).json({ message: "SuperAdmin not found" });
+      return res.json({ message: "SuperAdmin not found" });
     }
 
     const isMatch = await bcrypt.compare(password, superAdmin.password);
     if (!isMatch) {
-      return res.status(400).json({ message: "Invalid password" });
+      return res.json({ message: "Invalid password" });
     }
 
     const token = jwt.sign(
@@ -51,9 +50,9 @@ const loginSuperAdmin = async (req, res) => {
       { expiresIn: "1d" }
     );
 
-    res.status(200).json({ message: "Login successful", token });
+    res.json({ message: "Login successful", token });
   } catch (error) {
-    res.status(500).json({ message: "Something went wrong", error: error.message });
+    res.json({ message: "Something went wrong", error: error.message });
   }
 };
 
@@ -62,12 +61,35 @@ const getSuperAdmin = async (req, res) => {
   try {
     const superAdmin = await SuperAdmin.findById(req.user.id).select("-password");
     if (!superAdmin) {
-      return res.status(404).json({ message: "SuperAdmin not found" });
+      return res.json({ message: "SuperAdmin not found" });
     }
-    res.status(200).json(superAdmin);
+    res.json(superAdmin);
   } catch (error) {
-    res.status(500).json({ message: "Something went wrong", error: error.message });
+    res.json({ message: "Something went wrong", error: error.message });
   }
 };
 
-module.exports = { registerSuperAdmin, loginSuperAdmin, getSuperAdmin };
+// update superadmin profile
+const updateSuperAdmin = async (req, res) => {
+  try {
+    const updatedData = { ...req.body };
+
+    if (req.file) {
+      updatedData.profileImage = req.file.path;
+    }
+
+    if (updatedData.password) {
+      updatedData.password = await bcrypt.hash(updatedData.password, 10);
+    }
+
+    const superAdmin = await SuperAdmin.findByIdAndUpdate(req.user.id, updatedData, { new: true }).select("-password");
+    if (!superAdmin) {
+      return res.json({ message: "SuperAdmin not found" });
+    }
+    res.json({ message: "SuperAdmin updated successfully", superAdmin });
+  } catch (error) {
+    res.json({ message: "Something went wrong", error: error.message });
+  }
+};
+
+module.exports = { registerSuperAdmin, loginSuperAdmin, getSuperAdmin, updateSuperAdmin };

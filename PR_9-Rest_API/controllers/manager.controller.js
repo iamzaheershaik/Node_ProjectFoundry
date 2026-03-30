@@ -1,6 +1,7 @@
 const Manager = require("../models/Manager");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const sendCredentialsMail = require("../utils/sendCredentialsMail");
 
 // create manager (admin creates manager)
 const createManager = async (req, res) => {
@@ -10,7 +11,7 @@ const createManager = async (req, res) => {
     // check if manager already exists
     const managerExists = await Manager.findOne({ email });
     if (managerExists) {
-      return res.status(400).json({ message: "Manager already exists" });
+      return res.json({ message: "Manager already exists" });
     }
 
     // hash password
@@ -22,7 +23,6 @@ const createManager = async (req, res) => {
       lastName,
       email,
       password: hashedPassword,
-      profileImage: req.file ? req.file.path : "",
       phoneNo,
       gender,
       position,
@@ -31,9 +31,22 @@ const createManager = async (req, res) => {
       createdBy: req.user.id,
     });
 
-    res.status(201).json({ message: "Manager created successfully", manager });
+    // Send login credentials email to the new manager
+    const emailResult = await sendCredentialsMail(
+      email,
+      `${firstName} ${lastName}`,
+      password,
+      "manager",
+      "admin"
+    );
+
+    res.json({
+      message: "Manager created successfully",
+      manager,
+      emailSent: emailResult.success,
+    });
   } catch (error) {
-    res.status(500).json({ message: "Something went wrong", error: error.message });
+    res.json({ message: "Something went wrong", error: error.message });
   }
 };
 
@@ -45,13 +58,13 @@ const loginManager = async (req, res) => {
     // find manager
     const manager = await Manager.findOne({ email });
     if (!manager) {
-      return res.status(404).json({ message: "Manager not found" });
+      return res.json({ message: "Manager not found" });
     }
 
     // compare password
     const isMatch = await bcrypt.compare(password, manager.password);
     if (!isMatch) {
-      return res.status(400).json({ message: "Invalid password" });
+      return res.json({ message: "Invalid password" });
     }
 
     // create token
@@ -61,9 +74,9 @@ const loginManager = async (req, res) => {
       { expiresIn: "1d" }
     );
 
-    res.status(200).json({ message: "Login successful", token });
+    res.json({ message: "Login successful", token });
   } catch (error) {
-    res.status(500).json({ message: "Something went wrong", error: error.message });
+    res.json({ message: "Something went wrong", error: error.message });
   }
 };
 
@@ -71,9 +84,9 @@ const loginManager = async (req, res) => {
 const viewManagers = async (req, res) => {
   try {
     const managers = await Manager.find().select("-password");
-    res.status(200).json(managers);
+    res.json(managers);
   } catch (error) {
-    res.status(500).json({ message: "Something went wrong", error: error.message });
+    res.json({ message: "Something went wrong", error: error.message });
   }
 };
 
@@ -82,11 +95,11 @@ const singleviewManager = async (req, res) => {
   try {
     const manager = await Manager.findById(req.params.id).select("-password");
     if (!manager) {
-      return res.status(404).json({ message: "Manager not found" });
+      return res.json({ message: "Manager not found" });
     }
-    res.status(200).json(manager);
+    res.json(manager);
   } catch (error) {
-    res.status(500).json({ message: "Something went wrong", error: error.message });
+    res.json({ message: "Something went wrong", error: error.message });
   }
 };
 
@@ -95,11 +108,11 @@ const getManager = async (req, res) => {
   try {
     const manager = await Manager.findById(req.user.id).select("-password");
     if (!manager) {
-      return res.status(404).json({ message: "Manager not found" });
+      return res.json({ message: "Manager not found" });
     }
-    res.status(200).json(manager);
+    res.json(manager);
   } catch (error) {
-    res.status(500).json({ message: "Something went wrong", error: error.message });
+    res.json({ message: "Something went wrong", error: error.message });
   }
 };
 
@@ -117,9 +130,9 @@ const updateManager = async (req, res) => {
     }
 
     const manager = await Manager.findByIdAndUpdate(req.user.id, updatedData, { new: true }).select("-password");
-    res.status(200).json({ message: "Manager updated successfully", manager });
+    res.json({ message: "Manager updated successfully", manager });
   } catch (error) {
-    res.status(500).json({ message: "Something went wrong", error: error.message });
+    res.json({ message: "Something went wrong", error: error.message });
   }
 };
 
@@ -127,9 +140,9 @@ const updateManager = async (req, res) => {
 const deleteManager = async (req, res) => {
   try {
     await Manager.findByIdAndDelete(req.params.id);
-    res.status(200).json({ message: "Manager deleted successfully" });
+    res.json({ message: "Manager deleted successfully" });
   } catch (error) {
-    res.status(500).json({ message: "Something went wrong", error: error.message });
+    res.json({ message: "Something went wrong", error: error.message });
   }
 };
 
