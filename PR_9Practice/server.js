@@ -19,28 +19,66 @@ mongoose
   });
 
 app.get("/products", (req, res) => {
-  res.send({ message: "All Products" });
+  productModel
+    .find()
+    .then((products) => {
+      res.send(products);
+    })
+    .catch((err) => {
+      console.log(err);
+      res.send({ message: "Some Problem" });
+    });
 });
 
 app.get("/products/:id", (req, res) => {
-  console.log(req.params.id);
-  res.send({ message: "Single Product id" });
+  productModel
+    .findOne({ _id: req.params.id })
+    .then((products) => {
+      res.send(products);
+    })
+    .catch((err) => {
+      console.log(err);
+      res.send({ message: "Some Problem" });
+    });
 });
 
 app.post("/products", (req, res) => {
-  console.log(req.body);
-  res.send({ message: "Post is Requested" });
+  let product = req.body;
+  console.log(product);
+  productModel
+    .create(product)
+    .then((document) => {
+      res.send({ data: document, message: "Product Created" });
+    })
+    .catch((err) => {
+      console.log(err);
+      res.send({ message: "Some Problem" });
+    });
 });
 
 app.delete("/products/:id", (req, res) => {
-  console.log(`${req.params.id} is deleted `);
-  res.send({ message: "Deleted the Product" });
+  productModel
+    .deleteOne({ _id: req.params.id })
+    .then((info) => {
+      res.send({ message: "Product is Deleted" });
+    })
+    .catch((err) => {
+      console.log(err);
+      res.send({ message: "Some Problem" });
+    });
 });
 
 app.put("/products/:id", (req, res) => {
-  console.log(req.params.id);
-  console.log(req.body);
-  res.send({ message: "Put is Successful" });
+  let product = req.body;
+  productModel
+    .updateOne({ _id: req.params.id }, product)
+    .then((info) => {
+      res.send({ message: "Product is Updated" });
+    })
+    .catch((err) => {
+      console.log(err);
+      res.send({ message: "Some Problem" });
+    });
 });
 
 const ProductSchema = mongoose.Schema(
@@ -63,7 +101,7 @@ const ProductSchema = mongoose.Schema(
       enum: ["Clothing", "Electronics", "HouseHold"],
     },
   },
-  { timeStamps: true },
+  { timestamps: true },
 );
 
 const productModel = mongoose.model("products", ProductSchema);

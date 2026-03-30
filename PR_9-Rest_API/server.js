@@ -1,8 +1,21 @@
-const express =  require('express');
+const express = require("express");
+const dotenv = require("dotenv").config();
+const PORT = process.env.PORT || 7092;
+const dbConnect = require("./config/dbConnection");
+
+dbConnect();
 const app = express();
-const PORT = 8089;
-const indexRoutes = require("./routes/index.routes.js");
-//middldware 
-app.use(express.urlencoded());
-//routes 
-app.get()
+
+// middleware
+app.use(express.json());
+app.use("/uploads", express.static("uploads"));
+
+//routes
+const routes = require("./routes/index.routes");
+app.use("/", routes);
+
+//start the server
+
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
