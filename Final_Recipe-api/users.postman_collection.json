@@ -1,0 +1,200 @@
+{
+  "info": {
+    "_postman_id": "12a9857a-d9eb-4b69-8d59-3155da971cd4",
+    "name": "users",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "53254464"
+  },
+  "item": [
+    {
+      "name": "auth-Post-register-login",
+      "item": [
+        {
+          "name": "http://localhost:7890/api/auth/register",
+          "request": {
+            "auth": {
+              "type": "inherit"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"username\":\"john peter\",\r\n    \"email\":\"john@test.in\",\r\n    \"password\":\"123456\",\r\n    \"role\":\"maneger\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:7890/api/auth/register",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "7890",
+              "path": [
+                "api",
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:7890/api/auth/login",
+          "request": {
+            "auth": {
+              "type": "inherit"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"email\":\"john@test.in\",   \r\n    \"password\":\"123456\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:7890/api/auth/login",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "7890",
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "creatingRecipe",
+      "item": [
+        {
+          "name": "http://localhost:7890/api/recipes",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"title\": \"Garlic Butter Zucchini Noodles\",\r\n  \"ingredients\": [\"2 large zucchinis, spiralized\", \"3 tbsp butter\", \"2 cloves garlic, minced\", \"1/4 cup parmesan cheese\", \"1 tsp lemon juice\"],\r\n  \"instructions\": \"Melt butter in a skillet over medium heat and sauté garlic for 30 seconds. Add zucchini noodles and toss for 2-3 minutes. Remove from heat and stir in parmesan cheese and lemon juice.\"\r\n}\r\n\r\n\r\n\r\n\r\n\r\n\r\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:7890/api/recipes",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "7890",
+              "path": [
+                "api",
+                "recipes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:7890/api/recipes",
+          "request": {
+            "auth": {
+              "type": "inherit"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:7890/api/recipes",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "7890",
+              "path": [
+                "api",
+                "recipes"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "http://localhost:7890/api/recipes/69ce5dbcb7fa4177cd85fd2e",
+          "request": {
+            "auth": {
+              "type": "inherit"
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:7890/api/recipes/69ce5dbcb7fa4177cd85fd2e",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "7890",
+              "path": [
+                "api",
+                "recipes",
+                "69ce5dbcb7fa4177cd85fd2e"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "commentsOnReceipe",
+      "item": [
+        {
+          "name": "http://localhost:7890/api/comments/69ce5dbcb7fa4177cd85fd2e",
+          "request": {
+            "auth": {
+              "type": "inherit"
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"text\": \"Wow, this was delicious! Highly recommend adding extra garlic!\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:7890/api/comments/69ce5dbcb7fa4177cd85fd2e",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "7890",
+              "path": [
+                "api",
+                "comments",
+                "69ce5dbcb7fa4177cd85fd2e"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

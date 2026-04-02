@@ -81,7 +81,14 @@ const getAdmin = async (req, res) => {
     if (!admin) {
       return res.json({ message: "Admin not found" });
     }
-    res.json(admin);
+
+    const adminObj = admin.toObject();
+    if (adminObj.profileImage) {
+      const baseUrl = `${req.protocol}://${req.get("host")}`;
+      adminObj.profileImage = `${baseUrl}/${adminObj.profileImage.replace(/\\/g, "/")}`;
+    }
+
+    res.json(adminObj);
   } catch (error) {
     res.json({ message: "Something went wrong", error: error.message });
   }
@@ -116,7 +123,7 @@ const updateAdmin = async (req, res) => {
     const updatedData = { ...req.body };
 
     if (req.file) {
-      updatedData.profileImage = req.file.path;
+      updatedData.profileImage = req.file.path.replace(/\\/g, "/");
     }
 
     if (updatedData.password) {
@@ -140,4 +147,66 @@ const deleteAdmin = async (req, res) => {
   }
 };
 
-module.exports = { createAdmin, loginAdmin, getAdmin, viewAdmins, singleviewAdmin, updateAdmin, deleteAdmin };
+// get admin profile as HTML page (renders image visually)
+const getMyProfile = async (req, res) => {
+  try {
+    const admin = await Admin.findById(req.user.id).select("-password");
+    if (!admin) {
+      return res.json({ message: "Admin not found" });
+    }
+
+    const baseUrl = `${req.protocol}://${req.get("host")}`;
+    const imageUrl = admin.profileImage
+      ? `${baseUrl}/${admin.profileImage.replace(/\\/g, "/")}`
+      : null;
+
+    const html = `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>${admin.firstName} ${admin.lastName} - Profile</title>
+      <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #1a1a2e; color: #eee; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .card { background: #16213e; border-radius: 16px; padding: 40px; max-width: 450px; width: 90%; box-shadow: 0 8px 32px rgba(0,0,0,0.4); text-align: center; }
+        .avatar { width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 4px solid #0f3460; margin-bottom: 20px; }
+        .no-avatar { width: 150px; height: 150px; border-radius: 50%; background: #0f3460; display: flex; align-items: center; justify-content: center; font-size: 48px; color: #e94560; margin: 0 auto 20px; }
+        h1 { font-size: 24px; color: #e94560; margin-bottom: 4px; }
+        .role { font-size: 14px; text-transform: uppercase; letter-spacing: 2px; color: #a8a8b3; margin-bottom: 24px; }
+        .info { text-align: left; }
+        .info-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #0f3460; }
+        .info-row:last-child { border-bottom: none; }
+        .label { color: #a8a8b3; font-size: 13px; }
+        .value { color: #eee; font-size: 14px; font-weight: 500; }
+      </style>
+    </head>
+    <body>
+      <div class="card">
+        ${imageUrl
+          ? `<img class="avatar" src="${imageUrl}" alt="Profile Image" />`
+          : `<div class="no-avatar">${admin.firstName[0]}${admin.lastName[0]}</div>`
+        }
+        <h1>${admin.firstName} ${admin.lastName}</h1>
+        <div class="role">${admin.role}</div>
+        <div class="info">
+          <div class="info-row"><span class="label">Email</span><span class="value">${admin.email}</span></div>
+          <div class="info-row"><span class="label">Phone</span><span class="value">${admin.phoneNo || "N/A"}</span></div>
+          <div class="info-row"><span class="label">Gender</span><span class="value">${admin.gender || "N/A"}</span></div>
+          <div class="info-row"><span class="label">Position</span><span class="value">${admin.position || "N/A"}</span></div>
+          <div class="info-row"><span class="label">Department</span><span class="value">${admin.department || "N/A"}</span></div>
+          <div class="info-row"><span class="label">Address</span><span class="value">${admin.address || "N/A"}</span></div>
+        </div>
+      </div>
+    </body>
+    </html>`;
+
+    res.setHeader("Content-Type", "text/html");
+    res.send(html);
+  } catch (error) {
+    res.json({ message: "Something went wrong", error: error.message });
+  }
+};
+
+module.exports = { createAdmin, loginAdmin, getAdmin, getMyProfile, viewAdmins, singleviewAdmin, updateAdmin, deleteAdmin };
