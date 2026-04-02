@@ -1,0 +1,50 @@
+{
+  "name": "vibe-error-explainer",
+  "version": "1.0.0",
+  "description": "Translates cryptic code errors into plain English — shows what went wrong, which file, which line, and suggests fixes. Powered by Claude AI with offline fallback. Supports Hindi, Telugu, Tamil, Urdu & more.",
+  "main": "index.js",
+  "bin": {
+    "vibe-error": "./bin/vibe-error.js"
+  },
+  "scripts": {
+    "test": "node test/parser.test.js && node test/codeReader.test.js && node test/offline.test.js",
+    "demo": "node examples/basic.js",
+    "demo:express": "node examples/express-app.js",
+    "demo:watch": "node bin/vibe-error.js --watch 'node examples/basic.js'"
+  },
+  "keywords": [
+    "error",
+    "debug",
+    "debugging",
+    "stack-trace",
+    "plain-english",
+    "developer-tools",
+    "dx",
+    "error-handling",
+    "beginner-friendly",
+    "vibe-coding",
+    "error-explainer",
+    "express-middleware",
+    "claude-ai",
+    "hindi",
+    "telugu",
+    "tamil",
+    "urdu",
+    "multilingual",
+    "error-translator",
+    "watch-mode"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "dotenv": "^16.4.7"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  }
+}

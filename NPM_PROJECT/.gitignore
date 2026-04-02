@@ -1,0 +1,7 @@
+node_modules/
+.env
+vibe-errors.log
+*.log
+.DS_Store
+coverage/
+dist/
