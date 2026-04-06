@@ -51,7 +51,7 @@ function loadConfig(runtimeOptions = {}) {
     // Model to use
     model: runtimeOptions.model
       || process.env.VIBE_MODEL
-      || 'gemini-flash-latest',
+      || 'gemma-4-26b-a4b-it',
   };
 
   return config;

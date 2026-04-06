@@ -37,8 +37,14 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@ai-sdk/google": "^3.0.58",
+    "@babel/parser": "^7.29.2",
+    "@babel/traverse": "^7.29.0",
+    "ai": "^6.0.146",
     "chalk": "^4.1.2",
-    "dotenv": "^16.4.7"
+    "dotenv": "^16.4.7",
+    "express": "^5.2.1",
+    "source-map": "^0.7.6"
   },
   "engines": {
     "node": ">=14.0.0"

@@ -1,20 +1,57 @@
 const fs = require('fs');
+const path = require('path');
+
+const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1 MB limit limit to prevent DOS
+const SENSITIVE_PATTERNS = ['.env', 'id_rsa', '.pem', 'credentials', 'secrets.json'];
+
+/**
+ * Validates if the file path is within project bounds and not sensitive
+ * @param {string} filePath - Path to check
+ * @returns {boolean} Whether the path is safe to read
+ */
+function isPathSafe(filePath) {
+  try {
+    if (typeof filePath !== 'string' || filePath.indexOf('\\0') !== -1) {
+      return false;
+    }
+    const resolvedPath = path.resolve(filePath);
+    const cwd = process.cwd();
+    
+    // Check directory traversal out of CWD
+    if (!resolvedPath.startsWith(cwd + path.sep) && resolvedPath !== cwd) {
+      // Allow if it's within node_modules somewhere just in case, but prefer not
+      // Usually users want their own errors, but the stack might have node_modules inside CWD anyway
+      return false;
+    }
+
+    // Check sensitive files
+    const basename = path.basename(resolvedPath).toLowerCase();
+    if (SENSITIVE_PATTERNS.some(p => basename.includes(p))) {
+      return false;
+    }
+
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 /**
  * Code Reader
  * Reads the actual source code around the error line
  */
-
-/**
- * Read source code around a specific line in a file
- * @param {string} filePath - Absolute path to the source file
- * @param {number} errorLine - The line number where the error occurred
- * @param {number} contextLines - Number of lines above/below to include (default: 5)
- * @returns {object|null} Code context object or null if file can't be read
- */
 function readCodeContext(filePath, errorLine, contextLines = 5) {
   try {
     if (!filePath || !fs.existsSync(filePath)) {
+      return null;
+    }
+
+    if (!isPathSafe(filePath)) {
+      return null;
+    }
+
+    const stats = fs.statSync(filePath);
+    if (stats.size > MAX_FILE_SIZE || stats.size === 0) {
       return null;
     }
 
@@ -55,8 +92,6 @@ function readCodeContext(filePath, errorLine, contextLines = 5) {
 
 /**
  * Format code context as a readable string with line numbers and arrow
- * @param {object} context - Code context from readCodeContext
- * @returns {string} Formatted code string
  */
 function formatCodeContext(context) {
   if (!context || !context.lines) return '';
@@ -72,8 +107,6 @@ function formatCodeContext(context) {
 
 /**
  * Get the code context as plain text (for AI prompt)
- * @param {object} context - Code context from readCodeContext
- * @returns {string} Plain text code snippet
  */
 function getCodeForPrompt(context) {
   if (!context || !context.lines) return '';
@@ -88,4 +121,5 @@ module.exports = {
   readCodeContext,
   formatCodeContext,
   getCodeForPrompt,
+  isPathSafe,
 };

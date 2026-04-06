@@ -23,6 +23,7 @@ function buildExplanationPrompt({ parsed, codeSnippet, lang = 'en' }) {
 - **Error Message**: ${parsed.message}
 - **File**: ${parsed.file || 'unknown'}
 - **Line**: ${parsed.line || 'unknown'}
+- **Column**: ${parsed.column || 'unknown'}
 - **Function**: ${parsed.functionName || 'unknown'}`;
 
   if (codeSnippet) {
@@ -52,7 +53,7 @@ ${language.promptInstruction}
 
 Respond in EXACTLY this JSON format (no markdown, no code fences):
 {
-  "explanation": "A clear, simple explanation of what went wrong and why. Talk like a friend helping a junior developer. 2-4 sentences max.",
+  "explanation": "Explain in clean neat language with no other mess. You MUST explicitly point out the exact error, what file it's in, and the specific line and column it occurred on. You MUST include the exact phrase 'THIS IS YOUR ERROR YOU NEED FIX THIS' and clearly state what should be there instead of it to fix the error.",
   "fix": "The specific fix for this error. Be concrete and actionable.",
   "fixedCode": "The actual corrected code that fixes the error. Show just the relevant lines. If you can't determine the fix from context, leave this as null.",
   "confidence": <number 0-100 representing how confident you are about this explanation>
@@ -60,6 +61,7 @@ Respond in EXACTLY this JSON format (no markdown, no code fences):
 
 Rules:
 - Keep the explanation SIMPLE. Imagine explaining to someone who just started coding.
+- The explanation must state the file, line, and column where the error originated.
 - In the fixedCode, show the corrected version of the broken code.
 - The confidence should be 90+ if the error is clear and common, 60-89 if you need more context, below 60 if the error is unusual.
 - Do NOT wrap your response in markdown code fences. Return raw JSON only.`;

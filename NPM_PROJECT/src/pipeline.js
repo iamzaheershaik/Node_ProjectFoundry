@@ -6,6 +6,8 @@ const { getAIExplanation } = require('./ai/explainer');
 const { findOfflineExplanation, getGenericExplanation } = require('./offline/dictionary');
 const { logError } = require('./features/errorHistory');
 const { searchStackOverflow } = require('./features/searchResources');
+const { getCache, setCache } = require('./core/cache');
+const { promptAutoFix } = require('./features/autofixer');
 
 /**
  * Central Pipeline
@@ -71,29 +73,42 @@ async function explainError(error, options = {}) {
   let isOffline = false;
 
   if (!config.offline && config.apiKey) {
-    // Try AI explanation first
-    try {
-      const aiResult = await getAIExplanation({
-        parsed,
-        codeSnippet,
-        apiKey: config.apiKey,
-        lang: config.lang,
-        model: config.model,
-      });
-
-      explanation = aiResult.explanation;
-      fixedCode = aiResult.fixedCode;
-      fix = aiResult.fix;
-      confidence = aiResult.confidence;
+    // Check Cache First
+    const cachedData = getCache(parsed);
+    if (cachedData) {
+      explanation = cachedData.explanation;
+      fixedCode = cachedData.fixedCode;
+      fix = cachedData.fix;
+      confidence = cachedData.confidence;
       isOffline = false;
-    } catch (aiErr) {
-      // Fall back to offline if AI fails
-      const offlineResult = findOfflineExplanation(parsed) || getGenericExplanation(parsed);
-      explanation = offlineResult.explanation;
-      fixedCode = offlineResult.fixedCode || null;
-      fix = offlineResult.fix || null;
-      confidence = offlineResult.confidence;
-      isOffline = true;
+    } else {
+      // Try AI explanation since it's not cached
+      try {
+        const aiResult = await getAIExplanation({
+          parsed,
+          codeSnippet,
+          apiKey: config.apiKey,
+          lang: config.lang,
+          model: config.model,
+        });
+
+        explanation = aiResult.explanation;
+        fixedCode = aiResult.fixedCode;
+        fix = aiResult.fix;
+        confidence = aiResult.confidence;
+        isOffline = false;
+        
+        // Save to cache for future
+        setCache(parsed, { explanation, fixedCode, fix, confidence });
+      } catch (aiErr) {
+        // Fall back to offline if AI fails
+        const offlineResult = findOfflineExplanation(parsed) || getGenericExplanation(parsed);
+        explanation = offlineResult.explanation;
+        fixedCode = offlineResult.fixedCode || null;
+        fix = offlineResult.fix || null;
+        confidence = offlineResult.confidence;
+        isOffline = true;
+      }
     }
   } else {
     // Offline mode
@@ -131,6 +146,8 @@ async function explainError(error, options = {}) {
   // ── Step 6: Display ──
   if (config.mode === 'dev') {
     printExplanation(result);
+    // Ask for Autofix 
+    await promptAutoFix(result, config);
   } else {
     printCompact(result);
   }

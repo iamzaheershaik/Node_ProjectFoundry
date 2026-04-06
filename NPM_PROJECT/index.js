@@ -20,7 +20,7 @@
 
 const { explainError } = require('./src/pipeline');
 const { vibeErrorMiddleware } = require('./src/middleware/express');
-const { interceptErrors } = require('./src/core/interceptor');
+const { interceptErrors, inject } = require('./src/core/interceptor');
 const { startWatchMode } = require('./src/features/watchMode');
 const { parseError, getFirstUserFrame } = require('./src/core/parser');
 const { readCodeContext, formatCodeContext } = require('./src/core/codeReader');
@@ -35,6 +35,7 @@ module.exports = {
   explainError,
   vibeErrorMiddleware,
   interceptErrors,
+  inject,
 
   // Features
   startWatchMode,

@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ $# -ne 1 ]]; then
+  echo "Usage: crun <file>"
+  exit 1
+fi
+
+file="$1"
+if [[ ! -f "$file" ]]; then
+  echo "File not found: $file" >&2
+  exit 1
+fi
+
+case "${file##*.}" in
+  cpp)
+    exe="$(mktemp /tmp/crun.XXXXXX)"
+    g++ --std=c++17 "$file" -o "$exe"
+    "$exe"
+    rc=$?
+    rm -f "$exe"
+    exit "$rc"
+    ;;
+  c)
+    exe="$(mktemp /tmp/crun.XXXXXX)"
+    gcc "$file" -o "$exe"
+    "$exe"
+    rc=$?
+    rm -f "$exe"
+    exit "$rc"
+    ;;
+  py)
+    python3 "$file"
+    ;;
+  js)
+    node "$file"
+    ;;
+  sh)
+    bash "$file"
+    ;;
+  *)
+    if head -n 1 "$file" | grep -qE '^#!'; then
+      chmod +x "$file"
+      exec "$file"
+    fi
+    echo "Unsupported file type: $file" >&2
+    echo "Supported: .cpp, .c, .py, .js, .sh, or executable script with shebang." >&2
+    exit 1
+    ;;
+esac
