@@ -1,0 +1,71 @@
+@keyframes float {
+  0% { transform: translateY(0px) scale(1); }
+  50% { transform: translateY(-10px) scale(1.02); }
+  100% { transform: translateY(0px) scale(1); }
+}
+
+@keyframes float-slow {
+  0% { transform: translateY(0px) scale(1); }
+  50% { transform: translateY(-20px) scale(1.05); }
+  100% { transform: translateY(0px) scale(1); }
+}
+
+@keyframes pulse-glow {
+  0% { box-shadow: 0 0 0 0 rgba(253, 186, 19, 0.4); }
+  70% { box-shadow: 0 0 0 20px rgba(253, 186, 19, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(253, 186, 19, 0); }
+}
+
+@keyframes pulse-glow-maroon {
+  0% { box-shadow: 0 0 0 0 rgba(143, 5, 0, 0.4); }
+  70% { box-shadow: 0 0 0 20px rgba(143, 5, 0, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(143, 5, 0, 0); }
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes reveal-up {
+  0% {
+    opacity: 0;
+    transform: translateY(40px);
+    filter: blur(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-float-slow {
+  animation: float-slow 15s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 3s infinite;
+}
+
+.animate-pulse-glow-maroon {
+  animation: pulse-glow-maroon 3s infinite;
+}
+
+.animate-marquee {
+  animation: marquee 30s linear infinite;
+  display: flex;
+  width: max-content;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+.reveal-up {
+  animation: reveal-up 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}

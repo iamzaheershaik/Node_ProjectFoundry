@@ -1,0 +1,221 @@
+@import "tailwindcss";
+
+/* ═══════════════════════════════════════════════
+   RWSkill Education — Ultra Modern Design System
+   Fonts loaded via <link> in index.html to avoid
+   @import ordering issues with Tailwind v4.
+   ═══════════════════════════════════════════════ */
+
+@theme {
+  /* ── Brand Colors (Refined & Accents) ── */
+  --color-maroon: #8f0500;
+  --color-maroon-light: #b31b16;
+  --color-maroon-dark: #6b0400;
+  --color-gold: #fdba13;
+  --color-gold-light: #fdd663;
+  --color-gold-dark: #d49a00;
+
+  /* ── Ultra-Modern Monochrome Palette ── */
+  --color-base-000: #ffffff;
+  --color-base-050: #fafafa;
+  --color-base-100: #f4f4f5;
+  --color-base-200: #e4e4e7;
+  --color-base-300: #d4d4d8;
+  --color-base-400: #a1a1aa;
+  --color-base-500: #71717a;
+  --color-base-600: #52525b;
+  --color-base-800: #27272a;
+  --color-base-900: #18181b;
+  --color-base-950: #09090b;
+
+  /* ── Semantic Backgrounds ── */
+  --color-background: var(--color-base-050);
+  --color-surface: var(--color-base-000);
+  --color-surface-hover: var(--color-base-050);
+  --color-surface-dark: var(--color-base-950);
+  --color-border-subtle: rgba(0, 0, 0, 0.08);
+  --color-border-strong: rgba(0, 0, 0, 0.15);
+
+  /* ── Typography High-Contrast ── */
+  --color-text-primary: var(--color-base-950);
+  --color-text-secondary: #52525b; /* zinc-600 */
+  --color-text-muted: #a1a1aa; /* zinc-400 */
+
+  /* ── Ultra-Smooth Shadows (Linear/Vercel style) ── */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.02);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+  --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+  
+  /* Colored glow */
+  --shadow-glow-maroon: 0 0 30px rgba(143, 5, 0, 0.15), 0 0 80px rgba(143, 5, 0, 0.1);
+  --shadow-glow-gold: 0 0 30px rgba(253, 186, 19, 0.15), 0 0 80px rgba(253, 186, 19, 0.1);
+
+  /* ── Fonts ── */
+  --font-display: 'Space Grotesk', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+@layer base {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    font-family: var(--font-body);
+    background-color: var(--color-background);
+    color: var(--color-text-primary);
+    line-height: 1.6;
+    overflow-x: hidden;
+    letter-spacing: -0.01em;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+  }
+
+  ::selection {
+    background-color: var(--color-base-950);
+    color: var(--color-base-000);
+  }
+}
+
+/* ═══════════════════════════════════════════════
+   Premium Custom Utility Classes & Components
+   ═══════════════════════════════════════════════ */
+
+@utility glass {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 1), 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+@utility glass-dark {
+  background: rgba(9, 9, 11, 0.7);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+@utility text-fluid-h1 {
+  font-size: clamp(3rem, 8vw, 6rem);
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+}
+
+@utility text-fluid-h2 {
+  font-size: clamp(2rem, 5vw, 4rem);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+
+@utility text-fluid-h3 {
+  font-size: clamp(1.5rem, 3vw, 2.5rem);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+@utility bg-mesh-light {
+  background-color: #fafafa;
+  background-image: 
+    radial-gradient(at 0% 0%, hsla(3, 100%, 75%, 0.15) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, hsla(43, 98%, 53%, 0.15) 0px, transparent 50%);
+}
+
+@utility bg-mesh-dark {
+  background-color: #09090b;
+  background-image: 
+    radial-gradient(at 0% 0%, hsla(3, 96%, 15%, 0.4) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, hsla(43, 98%, 15%, 0.4) 0px, transparent 50%);
+}
+
+@utility text-gradient-premium {
+  background: linear-gradient(135deg, var(--color-maroon) 0%, var(--color-base-950) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+@utility text-gradient-maroon {
+  background: linear-gradient(135deg, var(--color-maroon), #ff4d4d);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+@layer components {
+  /* ── Unified Section Layout ── */
+  .section-container {
+    width: 100%;
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0 1.5rem; /* Base padding */
+  }
+
+  @media (min-width: 640px) {
+    .section-container {
+      padding: 0 2rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .section-container {
+      padding: 0 4rem; /* Ensure generous horizontal breathing room globally */
+    }
+  }
+
+  /* ── Unified Vertical Padding ── */
+  .section-py {
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+  }
+  
+  @media (min-width: 768px) {
+    .section-py {
+      padding-top: 8rem;
+      padding-bottom: 8rem;
+    }
+  }
+}
+
+@utility scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@utility mask-edges {
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 8%,
+    black 92%,
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 8%,
+    black 92%,
+    transparent 100%
+  );
+}
