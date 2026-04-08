@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Execution Flow Stepper — Web Server Architecture</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+--bg-deep:#0a0a0f;--bg-panel:#11111b;--bg-editor:#16161e;--bg-line:#1a1a2e;
+--bg-active:#2a2a4a;--bg-hover:rgba(139,92,246,.08);
+--border:#1e1e32;--border-active:#7c3aed;
+--text:#c9d1d9;--text-dim:#565f89;--text-bright:#e2e8f0;
+--accent:#7c3aed;--accent-glow:rgba(124,58,237,.3);
+--green:#4ade80;--blue:#60a5fa;--orange:#fb923c;--pink:#f472b6;--cyan:#22d3ee;--yellow:#facc15;--red:#f87171;
+--step-pulse:rgba(124,58,237,.15);
+}
+html,body{height:100%;font-family:'Inter',sans-serif;background:var(--bg-deep);color:var(--text);overflow:hidden}
+
+/* LAYOUT */
+.app{display:grid;grid-template-rows:auto 1fr auto;height:100vh}
+.header{display:flex;align-items:center;justify-content:space-between;padding:12px 24px;background:var(--bg-panel);border-bottom:1px solid var(--border);gap:16px}
+.header h1{font-size:15px;font-weight:700;background:linear-gradient(135deg,var(--accent),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;white-space:nowrap}
+.header .phase-badge{font-size:11px;padding:4px 12px;border-radius:20px;background:var(--accent-glow);color:var(--accent);border:1px solid var(--accent);font-weight:600;white-space:nowrap}
+.main{display:grid;grid-template-columns:220px 1fr 260px;overflow:hidden}
+.footer{display:flex;align-items:center;justify-content:space-between;padding:8px 24px;background:var(--bg-panel);border-top:1px solid var(--border);gap:12px}
+
+/* SIDEBAR */
+.sidebar{background:var(--bg-panel);border-right:1px solid var(--border);overflow-y:auto;padding:12px 0}
+.sidebar h3{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-dim);padding:8px 16px 6px;font-weight:600}
+.file-item{display:flex;align-items:center;gap:8px;padding:7px 16px;cursor:pointer;font-size:12px;font-family:'JetBrains Mono',monospace;color:var(--text-dim);transition:.15s;border-left:2px solid transparent}
+.file-item:hover{background:var(--bg-hover);color:var(--text)}
+.file-item.active{color:var(--accent);border-left-color:var(--accent);background:var(--bg-hover)}
+.file-item .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.file-item.done .dot{background:var(--green)}
+.file-item.active .dot{background:var(--accent);box-shadow:0 0 6px var(--accent)}
+.file-item.pending .dot{background:var(--text-dim)}
+
+/* EDITOR */
+.editor-wrap{display:flex;flex-direction:column;overflow:hidden}
+.tab-bar{display:flex;gap:0;background:var(--bg-panel);border-bottom:1px solid var(--border);overflow-x:auto;min-height:36px}
+.tab{padding:8px 18px;font-size:12px;font-family:'JetBrains Mono',monospace;color:var(--text-dim);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:.15s}
+.tab:hover{color:var(--text)}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);background:var(--bg-editor)}
+.editor{flex:1;overflow-y:auto;background:var(--bg-editor);font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.7;padding:0}
+.code-line{display:flex;padding:0 16px 0 0;min-height:22px;transition:background .2s}
+.code-line .ln{width:48px;text-align:right;padding-right:16px;color:var(--text-dim);user-select:none;flex-shrink:0;font-size:12px}
+.code-line .code{white-space:pre;flex:1;padding-right:16px}
+.code-line.highlighted{background:var(--step-pulse);border-left:3px solid var(--accent);animation:pulse 1.5s ease-in-out infinite}
+.code-line.executed{background:rgba(74,222,128,.04);border-left:3px solid rgba(74,222,128,.3)}
+.code-line.next{background:rgba(251,146,60,.06);border-left:3px solid rgba(251,146,60,.3)}
+@keyframes pulse{0%,100%{background:var(--step-pulse)}50%{background:rgba(124,58,237,.25)}}
+
+/* RIGHT PANEL */
+.right-panel{background:var(--bg-panel);border-left:1px solid var(--border);overflow-y:auto;font-size:12px}
+.panel-section{border-bottom:1px solid var(--border);padding:12px 14px}
+.panel-section h4{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--text-dim);margin-bottom:8px;font-weight:600}
+.call-stack-item{padding:5px 8px;border-radius:4px;margin-bottom:3px;background:var(--bg-editor);color:var(--text);font-family:'JetBrains Mono',monospace;font-size:11px;border-left:2px solid var(--accent)}
+.var-row{display:flex;justify-content:space-between;padding:4px 8px;border-radius:4px;margin-bottom:2px;background:var(--bg-editor)}
+.var-row .vname{color:var(--cyan);font-family:'JetBrains Mono',monospace;font-size:11px}
+.var-row .vval{color:var(--orange);font-family:'JetBrains Mono',monospace;font-size:11px;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.explanation{padding:12px 14px;font-size:12px;line-height:1.6;color:var(--text);border-bottom:1px solid var(--border)}
+.explanation .emoji{font-size:14px;margin-right:4px}
+
+/* CONTROLS */
+.controls{display:flex;align-items:center;gap:6px}
+.ctrl-btn{padding:6px 14px;border:1px solid var(--border);background:var(--bg-editor);color:var(--text);border-radius:6px;cursor:pointer;font-size:12px;font-weight:500;transition:.15s;font-family:'Inter',sans-serif}
+.ctrl-btn:hover{border-color:var(--accent);color:var(--accent);background:var(--bg-hover)}
+.ctrl-btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.ctrl-btn.primary:hover{background:#6d28d9}
+.ctrl-btn:disabled{opacity:.3;cursor:not-allowed;border-color:var(--border)!important;color:var(--text-dim)!important;background:var(--bg-editor)!important}
+.progress{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-dim)}
+.progress-bar{width:200px;height:4px;background:var(--bg-editor);border-radius:4px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--pink));border-radius:4px;transition:width .3s ease}
+.step-counter{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text-dim)}
+.kbd{font-size:10px;padding:2px 6px;border:1px solid var(--border);border-radius:3px;color:var(--text-dim);font-family:'JetBrains Mono',monospace;margin-left:4px}
+
+/* SYNTAX COLORS */
+.kw{color:#bb9af7}.str{color:#9ece6a}.fn{color:#7aa2f7}.cm{color:#565f89;font-style:italic}
+.num{color:#ff9e64}.op{color:#89ddff}.pr{color:#f7768e}.obj{color:#e0af68}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:#333}
+
+/* SPEED SELECTOR */
+.speed-select{background:var(--bg-editor);color:var(--text);border:1px solid var(--border);border-radius:4px;padding:3px 8px;font-size:11px;font-family:'Inter',sans-serif;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="header">
+    <h1>⚡ Execution Flow Stepper</h1>
+    <span class="phase-badge" id="phaseBadge">Chapter 2: TCP Server</span>
+    <div class="controls">
+      <button class="ctrl-btn" id="btnReset" title="Reset">⟲ Reset</button>
+      <button class="ctrl-btn" id="btnPrev" title="Previous Step">◀ Prev <span class="kbd">←</span></button>
+      <button class="ctrl-btn primary" id="btnNext" title="Next Step">Next ▶ <span class="kbd">→</span></button>
+      <button class="ctrl-btn" id="btnPlay" title="Auto-play">▶ Play <span class="kbd">Space</span></button>
+      <select class="speed-select" id="speedSelect"><option value="2000">Slow</option><option value="1000" selected>Normal</option><option value="500">Fast</option></select>
+    </div>
+  </header>
+  <div class="main">
+    <aside class="sidebar">
+      <h3>📁 Files</h3>
+      <div id="fileList"></div>
+      <h3 style="margin-top:16px">📍 Chapters</h3>
+      <div id="chapterList"></div>
+    </aside>
+    <section class="editor-wrap">
+      <div class="tab-bar" id="tabBar"></div>
+      <div class="editor" id="editor"></div>
+    </section>
+    <aside class="right-panel">
+      <div class="explanation" id="explanation"><span class="emoji">👋</span> Press <b>Next</b> or <b>→</b> to start tracing execution.</div>
+      <div class="panel-section"><h4>📚 Call Stack</h4><div id="callStack"><span style="color:var(--text-dim);font-size:11px">Empty</span></div></div>
+      <div class="panel-section"><h4>📦 Variables / State</h4><div id="variables"><span style="color:var(--text-dim);font-size:11px">No variables yet</span></div></div>
+      <div class="panel-section"><h4>🔌 Events</h4><div id="events"><span style="color:var(--text-dim);font-size:11px">No events fired</span></div></div>
+    </aside>
+  </div>
+  <footer class="footer">
+    <div class="progress"><div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div><span class="step-counter" id="stepCounter">0 / 0</span></div>
+    <div style="font-size:11px;color:var(--text-dim)">Node.js Web Server — From TCP to HTTP | ← → Space to navigate</div>
+  </footer>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// FILE DEFINITIONS — actual code from the project
+// ═══════════════════════════════════════════════════════
+const FILES = {
+  "01-tcp-server/server.js": {
+    chapter: "Chapter 2: TCP Server",
+    lines: [
+      [`<span class="kw">const</span> net = <span class="fn">require</span>(<span class="str">'net'</span>);`, "Import Node's built-in TCP networking module"],
+      [``, ""],
+      [`<span class="kw">const</span> server = net.<span class="fn">createServer</span>((<span class="obj">socket</span>) => {`, "Create TCP server — callback runs for EACH new client connection"],
+      [`    <span class="fn">console.log</span>(<span class="str">"New client connected"</span>);`, "Log when a client connects"],
+      [`    <span class="fn">console.log</span>(<span class="str">'Client address :'</span>, <span class="obj">socket</span>.remoteAddress, <span class="str">":"</span>, <span class="obj">socket</span>.remotePort);`, "Show client's IP and port"],
+      [``, ""],
+      [`    <span class="obj">socket</span>.<span class="fn">on</span>(<span class="str">'data'</span>, (<span class="obj">data</span>) => {`, "Register handler: fires when client sends bytes"],
+      [`        <span class="fn">console.log</span>(<span class="str">'Received:'</span>, <span class="obj">data</span>.<span class="fn">toString</span>());`, "Convert Buffer to string and log"],
+      [`        <span class="obj">socket</span>.<span class="fn">write</span>(<span class="str">"Server says: "</span> + <span class="obj">data</span>.<span class="fn">toString</span>());`, "Echo data back to client (TCP write)"],
+      [`    });`, ""],
+      [``, ""],
+      [`    <span class="obj">socket</span>.<span class="fn">on</span>(<span class="str">'end'</span>, () => {`, "Register handler: fires on client disconnect"],
+      [`        <span class="fn">console.log</span>(<span class="str">"client disconnected."</span>);`, "Log disconnect"],
+      [`    });`, ""],
+      [``, ""],
+      [`    <span class="obj">socket</span>.<span class="fn">on</span>(<span class="str">'error'</span>, (<span class="obj">err</span>) => {`, "Register error handler — ALWAYS needed"],
+      [`        <span class="fn">console.error</span>(<span class="str">'socket error'</span>, <span class="obj">err</span>.message);`, "Log error without crashing server"],
+      [`    });`, ""],
+      [`});`, "End of createServer callback"],
+      [``, ""],
+      [`server.<span class="fn">listen</span>(<span class="num">3000</span>, <span class="str">'0.0.0.0'</span>, () => {`, "Bind to port 3000 on all interfaces"],
+      [`    <span class="fn">console.log</span>(<span class="str">"TCP Server listening on port 3000"</span>)`, "Server is ready to accept connections"],
+      [`});`, ""]
+    ]
+  },
+  "02-promises-events/promise-socket.js": {
+    chapter: "Chapter 3: Promises & Events",
+    lines: [
+      [`<span class="kw">const</span> net = <span class="fn">require</span>(<span class="str">'net'</span>);`, ""],
+      [`<span class="kw">const</span> {EventEmitter} = <span class="fn">require</span>(<span class="str">'events'</span>);`, "Import EventEmitter (bridge between events and promises)"],
+      [``, ""],
+      [`<span class="kw">function</span> <span class="fn">socketRead</span>(<span class="obj">socket</span>){`, "Wraps socket 'data' event into a Promise"],
+      [`    <span class="kw">return new</span> <span class="fn">Promise</span>((<span class="obj">resolve</span>, <span class="obj">reject</span>) => {`, "Create promise that resolves on data arrival"],
+      [`        <span class="obj">socket</span>.<span class="fn">once</span>(<span class="str">'data'</span>, (<span class="obj">data</span>) => {`, "Listen for ONE data event"],
+      [`            <span class="fn">resolve</span>(<span class="obj">data</span>)`, "Resolve promise with received Buffer"],
+      [`        });`, ""],
+      [`        <span class="obj">socket</span>.<span class="fn">once</span>(<span class="str">'error'</span>, (<span class="obj">err</span>) => {`, "Handle socket errors"],
+      [`            <span class="fn">reject</span>(<span class="obj">err</span>);`, "Reject promise on error"],
+      [`        })`, ""],
+      [`        <span class="obj">socket</span>.<span class="fn">once</span>(<span class="str">'end'</span>, () => {`, "Handle connection close"],
+      [`            <span class="fn">resolve</span>(<span class="kw">null</span>);`, "Resolve with null if connection ends"],
+      [`        })`, ""],
+      [`    })`, ""],
+      [`}`, ""],
+      [``, ""],
+      [`<span class="kw">function</span> <span class="fn">socketWrite</span>(<span class="obj">socket</span>, <span class="obj">data</span>){`, "Wraps socket.write in a Promise"],
+      [`    <span class="kw">return new</span> <span class="fn">Promise</span>((<span class="obj">resolve</span>, <span class="obj">reject</span>) => {`, "Promise resolves when write is flushed"],
+      [`        <span class="kw">const</span> flushed = <span class="obj">socket</span>.<span class="fn">write</span>(<span class="obj">data</span>, (<span class="obj">err</span>) => {`, "Write data, callback fires on flush/error"],
+      [`            <span class="kw">if</span>(<span class="obj">err</span>) <span class="fn">reject</span>(<span class="obj">err</span>);`, "Reject on write error"],
+      [`            <span class="kw">else</span> <span class="fn">resolve</span>();`, "Resolve on successful write"],
+      [`        })`, ""],
+      [`    })`, ""],
+      [`}`, ""],
+      [``, ""],
+      [`<span class="kw">function</span> <span class="fn">serverListen</span>(<span class="obj">server</span>, <span class="obj">port</span>, <span class="obj">host</span>){`, "Wraps server.listen in a Promise"],
+      [`    <span class="kw">return new</span> <span class="fn">Promise</span>((<span class="obj">resolve</span>, <span class="obj">reject</span>) => {`, ""],
+      [`        <span class="obj">server</span>.<span class="fn">once</span>(<span class="str">'error'</span>, <span class="obj">reject</span>);`, "Reject on bind error (port in use, etc.)"],
+      [`        <span class="obj">server</span>.<span class="fn">listen</span>(<span class="obj">port</span>, <span class="obj">host</span>, () => {`, "Start listening"],
+      [`            <span class="obj">server</span>.<span class="fn">removeListener</span>(<span class="str">'error'</span>, <span class="obj">reject</span>);`, "Clean up error listener after success"],
+      [`            <span class="fn">resolve</span>();`, "Server is now listening"],
+      [`        })`, ""],
+      [`    })`, ""],
+      [`}`, ""],
+      [``, ""],
+      [`<span class="kw">function</span> <span class="fn">serverAccept</span>(<span class="obj">server</span>){`, "Wait for ONE incoming connection"],
+      [`    <span class="kw">return new</span> <span class="fn">Promise</span>((<span class="obj">resolve</span>) => {`, ""],
+      [`        <span class="obj">server</span>.<span class="fn">once</span>(<span class="str">'connection'</span>, (<span class="obj">socket</span>) => {`, "Listen for connection event"],
+      [`            <span class="fn">resolve</span>(<span class="obj">socket</span>)`, "Return the connected socket"],
+      [`        })`, ""],
+      [`    })`, ""],
+      [`}`, ""],
+      [``, ""],
+      [`<span class="kw">module.exports</span> = {socketRead, socketWrite, serverListen, serverAccept};`, "Export all 4 utility functions"]
+    ]
+  },
+  "03-simple-protocol/protocol.js": {
+    chapter: "Chapter 4: Message Protocol",
+    lines: [
+      [`<span class="cm">// Length-prefixed message framing protocol</span>`, "Solves TCP's message boundary problem"],
+      [``, ""],
+      [`<span class="kw">class</span> <span class="fn">MessageReader</span> {`, "Accumulates bytes and extracts complete messages"],
+      [`    <span class="fn">constructor</span>() {`, ""],
+      [`        <span class="kw">this</span>.buffer = Buffer.<span class="fn">alloc</span>(<span class="num">0</span>);`, "Empty buffer to accumulate incoming bytes"],
+      [`        <span class="kw">this</span>.messages = [];`, "Queue of complete decoded messages"],
+      [`    }`, ""],
+      [``, ""],
+      [`    <span class="fn">push</span>(<span class="obj">data</span>) {`, "Called each time socket receives data"],
+      [`        <span class="kw">this</span>.buffer = Buffer.<span class="fn">concat</span>([<span class="kw">this</span>.buffer, <span class="obj">data</span>]);`, "Append new chunk to buffer"],
+      [``, ""],
+      [`        <span class="kw">while</span> (<span class="kw">this</span>.buffer.length >= <span class="num">4</span>) {`, "Loop: extract all complete messages"],
+      [`            <span class="kw">const</span> msgLen = <span class="kw">this</span>.buffer.<span class="fn">readUInt32BE</span>(<span class="num">0</span>);`, "Read 4-byte length prefix (big-endian)"],
+      [``, ""],
+      [`            <span class="kw">if</span> (<span class="kw">this</span>.buffer.length < <span class="num">4</span> + msgLen) <span class="kw">break</span>;`, "Not enough bytes yet — wait for more"],
+      [``, ""],
+      [`            <span class="kw">const</span> msg = <span class="kw">this</span>.buffer.<span class="fn">subarray</span>(<span class="num">4</span>, <span class="num">4</span> + msgLen);`, "Extract message payload (skip header)"],
+      [`            <span class="kw">this</span>.messages.<span class="fn">push</span>(msg);`, "Queue the complete message"],
+      [`            <span class="kw">this</span>.buffer = <span class="kw">this</span>.buffer.<span class="fn">subarray</span>(<span class="num">4</span> + msgLen);`, "Remove processed bytes from buffer"],
+      [`        }`, ""],
+      [`    }`, ""],
+      [``, ""],
+      [`    <span class="fn">pop</span>()  { <span class="kw">return</span> <span class="kw">this</span>.messages.length ? <span class="kw">this</span>.messages.<span class="fn">shift</span>() : <span class="kw">null</span>; }`, "Dequeue next message or null"],
+      [`    <span class="fn">hasMessage</span>() { <span class="kw">return</span> <span class="kw">this</span>.messages.length > <span class="num">0</span>; }`, "Check if messages are available"],
+      [`}`, ""],
+      [``, ""],
+      [`<span class="kw">function</span> <span class="fn">encodeMessage</span>(<span class="obj">data</span>) {`, "Encode: prepend 4-byte length header"],
+      [`    <span class="kw">const</span> payload = Buffer.isBuffer(<span class="obj">data</span>) ? <span class="obj">data</span> : Buffer.<span class="fn">from</span>(<span class="obj">data</span>);`, "Convert string to Buffer if needed"],
+      [`    <span class="kw">const</span> header = Buffer.<span class="fn">alloc</span>(<span class="num">4</span>);`, "Allocate 4-byte header"],
+      [`    header.<span class="fn">writeUInt32BE</span>(payload.length, <span class="num">0</span>);`, "Write payload length as big-endian uint32"],
+      [`    <span class="kw">return</span> Buffer.<span class="fn">concat</span>([header, payload]);`, "Return [header + payload]"],
+      [`}`, ""],
+      [``, ""],
+      [`<span class="kw">module.exports</span> = { MessageReader, encodeMessage };`, ""]
+    ]
+  },
+  "05-http-server/server.js": {
+    chapter: "Chapter 6: HTTP Server",
+    lines: [
+      [`<span class="kw">const</span> net = <span class="fn">require</span>(<span class="str">'net'</span>);`, "TCP module — the foundation layer"],
+      [`<span class="kw">const</span> { HTTPRequestParser, buildResponse } = <span class="fn">require</span>(<span class="str">'../04-http-parser/http-parser'</span>);`, "Import our custom HTTP parser from Chapter 5"],
+      [``, ""],
+      [`<span class="cm">// === ROUTE HANDLERS ===</span>`, "Define what each URL path returns"],
+      [`<span class="kw">const</span> routes = {`, "Route table: maps paths → handler functions"],
+      [`    <span class="str">'/'</span>: (<span class="obj">request</span>) => {`, "Home page route handler"],
+      [`        <span class="kw">const</span> html = <span class="str">\`&lt;!DOCTYPE html&gt;...&lt;h1&gt;Hello!&lt;/h1&gt;...\`</span>;`, "Build HTML with request info embedded"],
+      [`        <span class="kw">return</span> <span class="fn">buildResponse</span>(<span class="num">200</span>, <span class="str">'OK'</span>, {<span class="str">'Content-Type'</span>: <span class="str">'text/html'</span>}, html);`, "Build HTTP response with status 200"],
+      [`    },`, ""],
+      [`    <span class="str">'/about'</span>: (<span class="obj">request</span>) => { <span class="cm">/* similar */</span> },`, "About page handler"],
+      [`    <span class="str">'/json'</span>: (<span class="obj">request</span>) => {`, "JSON API endpoint"],
+      [`        <span class="kw">const</span> data = JSON.<span class="fn">stringify</span>({...});`, "Serialize object to JSON string"],
+      [`        <span class="kw">return</span> <span class="fn">buildResponse</span>(<span class="num">200</span>, <span class="str">'OK'</span>, {<span class="str">'Content-Type'</span>: <span class="str">'application/json'</span>}, data);`, "Return JSON response"],
+      [`    }`, ""],
+      [`};`, ""],
+      [``, ""],
+      [`<span class="cm">// === THE SERVER ===</span>`, ""],
+      [`<span class="kw">const</span> server = net.<span class="fn">createServer</span>((<span class="obj">socket</span>) => {`, "TCP server — each connection gets a handler"],
+      [`    <span class="kw">const</span> parser = <span class="kw">new</span> <span class="fn">HTTPRequestParser</span>();`, "Create parser instance PER connection"],
+      [``, ""],
+      [`    <span class="obj">socket</span>.<span class="fn">on</span>(<span class="str">'data'</span>, (<span class="obj">data</span>) => {`, "When raw TCP bytes arrive..."],
+      [`        parser.<span class="fn">push</span>(<span class="obj">data</span>);`, "Feed bytes into the HTTP parser"],
+      [`        <span class="kw">const</span> request = parser.<span class="fn">parse</span>();`, "Attempt to parse complete request"],
+      [`        <span class="kw">if</span> (!request) <span class="kw">return</span>;`, "Headers not complete yet — wait for more"],
+      [``, ""],
+      [`        <span class="fn">console.log</span>(<span class="str">\`\${request.method} \${request.path}\`</span>);`, "Log the request method and path"],
+      [`        <span class="kw">const</span> handler = routes[request.path];`, "Look up route handler"],
+      [`        <span class="kw">let</span> response;`, ""],
+      [`        <span class="kw">if</span> (handler) response = <span class="fn">handler</span>(request);`, "Found a route — generate response"],
+      [`        <span class="kw">else</span> response = <span class="fn">buildResponse</span>(<span class="num">404</span>, <span class="str">'Not Found'</span>, {...}, <span class="str">'404'</span>);`, "No route — return 404"],
+      [``, ""],
+      [`        <span class="obj">socket</span>.<span class="fn">write</span>(response);`, "Send HTTP response bytes over TCP"],
+      [`        <span class="obj">socket</span>.<span class="fn">end</span>();`, "Close TCP connection (Connection: close)"],
+      [`    });`, ""],
+      [``, ""],
+      [`    <span class="obj">socket</span>.<span class="fn">on</span>(<span class="str">'error'</span>, (<span class="obj">err</span>) => { ... });`, "Error handling"],
+      [`});`, ""],
+      [``, ""],
+      [`server.<span class="fn">listen</span>(<span class="num">3000</span>, <span class="str">'0.0.0.0'</span>, () => {`, "Bind to port 3000"],
+      [`    <span class="fn">console.log</span>(<span class="str">'🚀 HTTP Server running at http://localhost:3000'</span>);`, "Server ready!"],
+      [`});`, ""]
+    ]
+  }
+};
+
+// ═══════════════════════════════════════════════════════
+// EXECUTION STEPS — the trace through files
+// ═══════════════════════════════════════════════════════
+const STEPS = [
+  // ---- CHAPTER 2: TCP SERVER BOOT ----
+  {file:"01-tcp-server/server.js",line:0,phase:"Chapter 2: TCP Server",
+   explain:"🚀 Node.js starts executing server.js from top to bottom. First line — require the `net` module.",
+   stack:["main → server.js"],vars:{net:"[Module]"},events:[]},
+  {file:"01-tcp-server/server.js",line:2,
+   explain:"📡 `net.createServer()` creates a TCP server instance. The callback is NOT called yet — it's stored for later, when a client connects.",
+   stack:["main → server.js","net.createServer()"],vars:{net:"[Module]",server:"[TCPServer]"},events:[]},
+  {file:"01-tcp-server/server.js",line:20,
+   explain:"🔌 `server.listen(3000)` tells the OS to bind port 3000 and start accepting TCP connections. Execution is now event-driven.",
+   stack:["main → server.js","server.listen(3000)"],vars:{server:"[TCPServer]",port:"3000"},events:["listening → port 3000"]},
+  {file:"01-tcp-server/server.js",line:21,
+   explain:"✅ The listen callback fires — server is ready! Node.js now enters the event loop, waiting for connections.",
+   stack:["EventLoop","listen callback"],vars:{},events:["listening → port 3000","stdout: TCP Server listening..."]},
+
+  // CLIENT CONNECTS
+  {file:"01-tcp-server/server.js",line:2,
+   explain:"🔗 A client connects! Node fires the createServer callback with a new `socket` object representing this connection.",
+   stack:["EventLoop","connection callback"],vars:{socket:"[Socket {remoteAddress, remotePort}]"},events:["connection → new client"]},
+  {file:"01-tcp-server/server.js",line:3,
+   explain:"📝 Log 'New client connected'. The connection is established at the TCP level (3-way handshake completed).",
+   stack:["EventLoop","connection callback"],vars:{socket:"[Socket]"},events:["stdout: New client connected"]},
+  {file:"01-tcp-server/server.js",line:6,
+   explain:"📨 Register the 'data' event handler on this socket. When the client sends bytes, this callback will fire.",
+   stack:["EventLoop","connection callback","socket.on('data')"],vars:{},events:["registered: data handler"]},
+  {file:"01-tcp-server/server.js",line:11,
+   explain:"🔌 Register the 'end' event handler — fires when the client gracefully disconnects.",
+   stack:["EventLoop","connection callback","socket.on('end')"],vars:{},events:["registered: end handler"]},
+  {file:"01-tcp-server/server.js",line:15,
+   explain:"⚠️ Register the 'error' event handler — CRITICAL: without this, an error crashes the entire server!",
+   stack:["EventLoop","connection callback","socket.on('error')"],vars:{},events:["registered: error handler"]},
+
+  // DATA ARRIVES
+  {file:"01-tcp-server/server.js",line:7,
+   explain:"📩 Client sends data! The 'data' event fires. `data` is a Buffer (raw bytes), not a string.",
+   stack:["EventLoop","data callback"],vars:{data:"Buffer<'Hello from client!'>"},events:["data → 'Hello from client!'"]},
+  {file:"01-tcp-server/server.js",line:8,
+   explain:"↩️ Echo the data back: `socket.write()` sends bytes back to the client over the TCP connection.",
+   stack:["EventLoop","data callback","socket.write()"],vars:{},events:["write → 'Server says: Hello...'"]},
+
+  // ---- CHAPTER 3: PROMISES ----
+  {file:"02-promises-events/promise-socket.js",line:0,phase:"Chapter 3: Promises & Events",
+   explain:"🌉 Now we build a bridge between events and async/await. This file wraps socket events in Promises.",
+   stack:["require('./promise-socket')"],vars:{},events:[]},
+  {file:"02-promises-events/promise-socket.js",line:3,
+   explain:"📖 `socketRead` — wraps socket.once('data') in a Promise. Await this to read one message.",
+   stack:["define socketRead"],vars:{socketRead:"[Function]"},events:[]},
+  {file:"02-promises-events/promise-socket.js",line:5,
+   explain:"👂 Inside: listens for exactly ONE 'data' event using `.once()` (not `.on()`). This prevents memory leaks.",
+   stack:["define socketRead","socket.once('data')"],vars:{},events:[]},
+  {file:"02-promises-events/promise-socket.js",line:17,
+   explain:"✍️ `socketWrite` — wraps socket.write in a Promise. Resolves when the write buffer is flushed to the OS.",
+   stack:["define socketWrite"],vars:{socketWrite:"[Function]"},events:[]},
+  {file:"02-promises-events/promise-socket.js",line:25,
+   explain:"🏗️ `serverListen` — wraps server.listen in a Promise. Now you can: `await serverListen(server, 3000)`.",
+   stack:["define serverListen"],vars:{serverListen:"[Function]"},events:[]},
+  {file:"02-promises-events/promise-socket.js",line:34,
+   explain:"🤝 `serverAccept` — wraps the 'connection' event. Returns a Promise that resolves with the new socket.",
+   stack:["define serverAccept"],vars:{serverAccept:"[Function]"},events:[]},
+  {file:"02-promises-events/promise-socket.js",line:41,
+   explain:"📦 Export all 4 utilities. Other files can now `require('./promise-socket')` for clean async TCP code.",
+   stack:["module.exports"],vars:{exports:"{socketRead, socketWrite, serverListen, serverAccept}"},events:[]},
+
+  // ---- CHAPTER 4: PROTOCOL ----
+  {file:"03-simple-protocol/protocol.js",line:0,phase:"Chapter 4: Message Protocol",
+   explain:"🧩 TCP doesn't preserve message boundaries! This protocol prefixes each message with a 4-byte length.",
+   stack:["require('./protocol')"],vars:{},events:[]},
+  {file:"03-simple-protocol/protocol.js",line:2,
+   explain:"📦 `MessageReader` class — accumulates bytes and extracts complete messages from the TCP stream.",
+   stack:["define MessageReader"],vars:{},events:[]},
+  {file:"03-simple-protocol/protocol.js",line:4,
+   explain:"🗃️ Constructor initializes an empty buffer and message queue. New instance needed per connection.",
+   stack:["MessageReader.constructor"],vars:{"this.buffer":"Buffer(0)","this.messages":"[]"},events:[]},
+  {file:"03-simple-protocol/protocol.js",line:8,
+   explain:"📥 `.push(data)` — called each time the socket fires 'data'. Appends to internal buffer and tries to extract messages.",
+   stack:["MessageReader.push()"],vars:{},events:[]},
+  {file:"03-simple-protocol/protocol.js",line:11,
+   explain:"🔄 While loop: keeps extracting messages as long as buffer has at least 4 bytes (the length header).",
+   stack:["MessageReader.push()","while loop"],vars:{"buffer.length":"≥ 4"},events:[]},
+  {file:"03-simple-protocol/protocol.js",line:12,
+   explain:"📏 `readUInt32BE(0)` reads the first 4 bytes as a big-endian unsigned 32-bit integer — that's the message length.",
+   stack:["MessageReader.push()","readUInt32BE"],vars:{msgLen:"13"},events:[]},
+  {file:"03-simple-protocol/protocol.js",line:14,
+   explain:"✂️ Check: do we have 4 (header) + msgLen bytes? If not, break and wait for more TCP data chunks.",
+   stack:["MessageReader.push()","boundary check"],vars:{needed:"17",have:"17"},events:[]},
+  {file:"03-simple-protocol/protocol.js",line:15,
+   explain:"🎯 Extract the message payload: `subarray(4, 4+msgLen)` skips the header. Push to messages queue.",
+   stack:["MessageReader.push()","extract message"],vars:{msg:"'First message'"},events:["message extracted"]},
+
+  // ---- CHAPTER 6: HTTP SERVER (full flow) ----
+  {file:"05-http-server/server.js",line:0,phase:"Chapter 6: HTTP Server",
+   explain:"🌐 The grand finale — combining TCP + Parser into a real HTTP server. `require('net')` for TCP.",
+   stack:["main → server.js"],vars:{net:"[Module]"},events:[]},
+  {file:"05-http-server/server.js",line:1,
+   explain:"🔗 Import our HTTP parser from Chapter 5. This is the layered architecture in action!",
+   stack:["main → server.js","require('../04-http-parser')"],vars:{"HTTPRequestParser":"[Class]","buildResponse":"[Function]"},events:[]},
+  {file:"05-http-server/server.js",line:4,
+   explain:"🗺️ Define the route table — an object mapping URL paths to handler functions.",
+   stack:["main → server.js","define routes"],vars:{routes:"{/, /about, /json}"},events:[]},
+  {file:"05-http-server/server.js",line:5,
+   explain:"🏠 Home route '/': returns HTML with embedded request info. Uses `buildResponse(200, 'OK', headers, body)`.",
+   stack:["define routes['/']"],vars:{},events:[]},
+  {file:"05-http-server/server.js",line:17,
+   explain:"🔌 Create the TCP server. For EACH incoming TCP connection, we create a fresh HTTP parser.",
+   stack:["net.createServer()"],vars:{},events:[]},
+  {file:"05-http-server/server.js",line:18,
+   explain:"📋 `new HTTPRequestParser()` — each connection gets its own parser to accumulate & parse HTTP bytes.",
+   stack:["connection callback","new HTTPRequestParser()"],vars:{parser:"HTTPRequestParser{}"},events:["connection → new client"]},
+  {file:"05-http-server/server.js",line:20,
+   explain:"📨 Register 'data' handler. When the browser sends an HTTP request, TCP delivers it as raw bytes here.",
+   stack:["connection callback","socket.on('data')"],vars:{},events:["registered: data handler"]},
+
+  // BROWSER SENDS REQUEST
+  {file:"05-http-server/server.js",line:21,
+   explain:"📩 Browser sends `GET / HTTP/1.1\\r\\n...`. Raw bytes arrive → feed them into the parser.",
+   stack:["data callback","parser.push(data)"],vars:{data:"Buffer<GET / HTTP/1.1...>"},events:["data → HTTP request bytes"]},
+  {file:"05-http-server/server.js",line:22,
+   explain:"🔍 `parser.parse()` checks if we have complete headers (\\r\\n\\r\\n). If yes, returns structured request object.",
+   stack:["data callback","parser.parse()"],vars:{request:'{method:"GET", path:"/"}'},events:["parsed: GET /"]},
+  {file:"05-http-server/server.js",line:23,
+   explain:"✅ Request is complete (not null). If headers weren't complete, we'd return and wait for more data.",
+   stack:["data callback"],vars:{},events:[]},
+  {file:"05-http-server/server.js",line:25,
+   explain:"🔎 Look up `routes['/']` — found the home page handler! If path was unknown, handler would be undefined.",
+   stack:["data callback","route lookup"],vars:{handler:"[Function: '/' handler]"},events:[]},
+  {file:"05-http-server/server.js",line:28,
+   explain:"⚡ Call the handler: generates HTML, wraps it in `buildResponse(200, 'OK', headers, body)` → full HTTP response string.",
+   stack:["data callback","handler(request)","buildResponse()"],vars:{response:"'HTTP/1.1 200 OK\\r\\n...'"},events:[]},
+  {file:"05-http-server/server.js",line:30,
+   explain:"📤 `socket.write(response)` — sends the HTTP response string as raw TCP bytes back to the browser.",
+   stack:["data callback","socket.write()"],vars:{},events:["write → HTTP response"]},
+  {file:"05-http-server/server.js",line:31,
+   explain:"🔒 `socket.end()` — close the TCP connection. With `Connection: close`, each request is one connection.",
+   stack:["data callback","socket.end()"],vars:{},events:["connection closed"]},
+  {file:"05-http-server/server.js",line:36,
+   explain:"🎉 Server is listening! The full stack: TCP socket → HTTP parser → Route handler → HTTP response → TCP write. Architecture complete!",
+   stack:["server.listen(3000)"],vars:{PORT:"3000"},events:["listening → port 3000","🎉 Server ready!"]},
+];
+
+// ═══════════════════════════════════════════════════════
+// APP STATE & RENDERING
+// ═══════════════════════════════════════════════════════
+let currentStep = -1;
+let playing = false;
+let playTimer = null;
+let executedLines = {}; // {file: Set(lineIdx)}
+const fileKeys = Object.keys(FILES);
+
+function initUI() {
+  // File list
+  const fl = document.getElementById('fileList');
+  fl.innerHTML = fileKeys.map(f => `<div class="file-item pending" data-file="${f}"><span class="dot"></span>${f.split('/').pop()}</div>`).join('');
+  fl.querySelectorAll('.file-item').forEach(el => el.addEventListener('click', () => showFile(el.dataset.file)));
+
+  // Chapter list
+  const chapters = [...new Set(STEPS.filter(s=>s.phase).map(s=>s.phase))];
+  const cl = document.getElementById('chapterList');
+  cl.innerHTML = chapters.map((c,i) => {
+    const stepIdx = STEPS.findIndex(s=>s.phase===c);
+    return `<div class="file-item pending" data-step="${stepIdx}"><span class="dot"></span>${c}</div>`;
+  }).join('');
+  cl.querySelectorAll('.file-item').forEach(el => el.addEventListener('click', () => goToStep(parseInt(el.dataset.step))));
+
+  document.getElementById('btnNext').addEventListener('click', nextStep);
+  document.getElementById('btnPrev').addEventListener('click', prevStep);
+  document.getElementById('btnReset').addEventListener('click', reset);
+  document.getElementById('btnPlay').addEventListener('click', togglePlay);
+  document.addEventListener('keydown', e => {
+    if(e.key==='ArrowRight') nextStep();
+    else if(e.key==='ArrowLeft') prevStep();
+    else if(e.key===' ') { e.preventDefault(); togglePlay(); }
+  });
+  document.getElementById('stepCounter').textContent = `0 / ${STEPS.length}`;
+  showFile(fileKeys[0]);
+}
+
+function showFile(fileKey) {
+  const file = FILES[fileKey];
+  if(!file) return;
+
+  // Tabs
+  const tb = document.getElementById('tabBar');
+  tb.innerHTML = fileKeys.map(f => `<div class="tab ${f===fileKey?'active':''}" data-file="${f}">${f.split('/').pop()}</div>`).join('');
+  tb.querySelectorAll('.tab').forEach(el => el.addEventListener('click', () => showFile(el.dataset.file)));
+
+  // Editor lines
+  const ed = document.getElementById('editor');
+  const step = currentStep >= 0 ? STEPS[currentStep] : null;
+  const exSet = executedLines[fileKey] || new Set();
+
+  ed.innerHTML = file.lines.map((l, i) => {
+    let cls = 'code-line';
+    if(step && step.file === fileKey && step.line === i) cls += ' highlighted';
+    else if(exSet.has(i)) cls += ' executed';
+    return `<div class="${cls}" id="line-${i}"><span class="ln">${i+1}</span><span class="code">${l[0]}</span></div>`;
+  }).join('');
+
+  // Scroll to highlighted
+  setTimeout(() => {
+    const hl = ed.querySelector('.highlighted');
+    if(hl) hl.scrollIntoView({behavior:'smooth', block:'center'});
+  }, 50);
+
+  // Update file list active
+  document.querySelectorAll('#fileList .file-item').forEach(el => {
+    el.classList.toggle('active', el.dataset.file === fileKey);
+  });
+}
+
+function renderStep() {
+  if(currentStep < 0) return;
+  const step = STEPS[currentStep];
+
+  // Track executed lines
+  if(!executedLines[step.file]) executedLines[step.file] = new Set();
+  executedLines[step.file].add(step.line);
+
+  // Phase badge
+  if(step.phase) document.getElementById('phaseBadge').textContent = step.phase;
+
+  // Show the file
+  showFile(step.file);
+
+  // Explanation
+  document.getElementById('explanation').innerHTML = `<span class="emoji">${step.explain.slice(0,2)}</span> ${step.explain.slice(2)}`;
+
+  // Call stack
+  document.getElementById('callStack').innerHTML = (step.stack||[]).map(s => `<div class="call-stack-item">${s}</div>`).join('') || '<span style="color:var(--text-dim);font-size:11px">Empty</span>';
+
+  // Variables
+  const vars = step.vars || {};
+  const vk = Object.keys(vars);
+  document.getElementById('variables').innerHTML = vk.length ? vk.map(k => `<div class="var-row"><span class="vname">${k}</span><span class="vval" title="${vars[k]}">${vars[k]}</span></div>`).join('') : '<span style="color:var(--text-dim);font-size:11px">No variables</span>';
+
+  // Events
+  const evts = step.events || [];
+  document.getElementById('events').innerHTML = evts.length ? evts.map(e => `<div class="var-row"><span class="vval" style="max-width:100%;color:var(--green)">${e}</span></div>`).join('') : '<span style="color:var(--text-dim);font-size:11px">No events</span>';
+
+  // Progress
+  const pct = ((currentStep + 1) / STEPS.length * 100).toFixed(0);
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('stepCounter').textContent = `${currentStep + 1} / ${STEPS.length}`;
+
+  // Update file states
+  const touchedFiles = new Set(STEPS.slice(0, currentStep+1).map(s=>s.file));
+  document.querySelectorAll('#fileList .file-item').forEach(el => {
+    const f = el.dataset.file;
+    el.classList.remove('done','active','pending');
+    if(f === step.file) el.classList.add('active');
+    else if(touchedFiles.has(f)) el.classList.add('done');
+    else el.classList.add('pending');
+  });
+
+  // Chapter states
+  const currentPhaseIdx = STEPS.findIndex(s => s.phase === (step.phase || document.getElementById('phaseBadge').textContent));
+  document.querySelectorAll('#chapterList .file-item').forEach(el => {
+    const si = parseInt(el.dataset.step);
+    el.classList.remove('done','active','pending');
+    if(si === currentPhaseIdx || (step.phase && STEPS[si]?.phase === step.phase)) el.classList.add('active');
+    else if(si < currentStep) el.classList.add('done');
+    else el.classList.add('pending');
+  });
+
+  // Button states
+  document.getElementById('btnPrev').disabled = currentStep <= 0;
+  document.getElementById('btnNext').disabled = currentStep >= STEPS.length - 1;
+}
+
+function nextStep() {
+  if(currentStep < STEPS.length - 1) { currentStep++; renderStep(); }
+  else if(playing) togglePlay();
+}
+function prevStep() {
+  if(currentStep > 0) { currentStep--; executedLines = {}; for(let i=0;i<=currentStep;i++){const s=STEPS[i];if(!executedLines[s.file])executedLines[s.file]=new Set();executedLines[s.file].add(s.line);} renderStep(); }
+}
+function goToStep(idx) {
+  currentStep = Math.max(0, Math.min(idx, STEPS.length-1));
+  executedLines = {};
+  for(let i=0;i<=currentStep;i++){const s=STEPS[i];if(!executedLines[s.file])executedLines[s.file]=new Set();executedLines[s.file].add(s.line);}
+  renderStep();
+}
+function reset() { currentStep=-1; executedLines={}; playing=false; clearInterval(playTimer); document.getElementById('btnPlay').textContent='▶ Play'; showFile(fileKeys[0]); document.getElementById('explanation').innerHTML='<span class="emoji">👋</span> Press <b>Next</b> or <b>→</b> to start tracing execution.'; document.getElementById('callStack').innerHTML='<span style="color:var(--text-dim);font-size:11px">Empty</span>'; document.getElementById('variables').innerHTML='<span style="color:var(--text-dim);font-size:11px">No variables yet</span>'; document.getElementById('events').innerHTML='<span style="color:var(--text-dim);font-size:11px">No events fired</span>'; document.getElementById('progressFill').style.width='0%'; document.getElementById('stepCounter').textContent=`0 / ${STEPS.length}`; document.querySelectorAll('#fileList .file-item, #chapterList .file-item').forEach(el=>{el.classList.remove('done','active');el.classList.add('pending')}); document.getElementById('btnPrev').disabled=true; document.getElementById('btnNext').disabled=false; }
+function togglePlay() {
+  playing = !playing;
+  document.getElementById('btnPlay').innerHTML = playing ? '⏸ Pause <span class="kbd">Space</span>' : '▶ Play <span class="kbd">Space</span>';
+  if(playing) { playTimer = setInterval(nextStep, parseInt(document.getElementById('speedSelect').value)); }
+  else clearInterval(playTimer);
+}
+
+initUI();
+</script>
+</body>
+</html>
