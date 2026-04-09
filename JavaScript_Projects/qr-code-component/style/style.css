@@ -1,0 +1,30 @@
+body{
+    background-color:#D5E1EF;
+    font-family:cursive;
+    text-align:center;
+}
+
+.card{
+    width:100%;
+    max-width:302px;
+    height:470px;
+    background-color: white;
+    padding:1rem;
+    padding-bottom:3rem;
+    box-shadow: 0px 9px 20px 0px rgba(0, 0, 0, 0.3);
+    border-radius:16px;
+    position:fixed;
+    inset:0;
+    margin:auto;
+
+}
+img{
+    width:100%;
+    border-radius:10px;
+}
+h2{
+    color:Slate 900 #1f3251;
+}
+p{
+    color:Slate 500 #68778d
+}
